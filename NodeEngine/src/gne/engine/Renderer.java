@@ -35,17 +35,26 @@ public class Renderer {
 	
 	
 	public void render() {
+    	int ms = (int)System.currentTimeMillis();
+    	
     	int width = (int)primaryStage.getWidth(), height = (int)primaryStage.getHeight();
     	//clear scene
     	//ctx.clearRect(0, 0, width, height);
-    	ctx.setFill(new Color(0.9,0.85,0.6,1));
+    	ctx.setFill(new Color(0.2,0.3,0.2,1));
     	ctx.fillRect(0, 0, width, height);
-
+    	world.finalProcessing();
     	drawObjects(world.getDeco(0));
     	drawObjects(world.getDeco(1));
     	drawNodeConnections(world.getNodes());
     	drawNodes(world.getNodes());
     	drawObjects(world.getDeco(2));
+
+    	ms -= (int)System.currentTimeMillis();
+    	
+		ctx.setFill(Color.BLACK);
+    	ctx.setFont(new Font("consolas", 15));
+    	ctx.setTextAlign(TextAlignment.LEFT);
+    	ctx.fillText("Debug: "+ms, 0, 15);
 	}
 	
 	private void drawNodeConnections(Node[] nodes) {
@@ -77,8 +86,12 @@ public class Renderer {
     		int drawPosX = cam.transformX(node.posX);
     		int drawPosY = cam.transformY(node.posY);
     		
-    		if (drawPosX < 0 || drawPosX > width || drawPosY < 0)continue;
-    		else if (drawPosY > height-0)return;
+    		//is alive?, is in view range
+        	Image img = node.getImage();
+        	if (img == null) continue;	
+    		if (drawPosX < -img.getWidth()/2 || drawPosX > width + img.getWidth()/2 || drawPosY < -img.getHeight()/2)continue;
+    		else if (drawPosY > height+img.getHeight()/2)return;
+    		
     		//draw ground/get color
     		ctx.setFill(Color.WHITE);
     		if (scale > 0.9)
@@ -90,9 +103,7 @@ public class Renderer {
         	ctx.strokeOval(drawPosX-32*scale, drawPosY-16*scale, 64*scale, 32*scale);
         	
         	//drawGraphics
-        	Image img = node.getImage();
-        	if (img != null)
-        	ctx.drawImage(img, drawPosX-32*scale,drawPosY-32*scale-16*scale,img.getWidth()*scale,img.getHeight()*scale);
+        	ctx.drawImage(img, drawPosX-img.getWidth()/2*scale,drawPosY-img.getHeight()/2*scale,img.getWidth()*scale,img.getHeight()*scale);
         	
         	//node title/info
         	ctx.setFont(new Font("consolas", 15));
@@ -102,16 +113,24 @@ public class Renderer {
 	}
 	private void drawObjects(WorldObject[] worldObjects) {
     	//draw nodes: loop all nodes
+		int width = (int)primaryStage.getWidth(), height = (int)primaryStage.getHeight();
 		float scale = cam.scale;
     	for (int i = 0;i<worldObjects.length;i++) {
     		if (worldObjects[i].posZ == 0)scale = cam.scale;
     		else scale = cam.scale*(float)worldObjects[i].posZ;
     		if (scale > 10)continue;
+    		
     		int drawPosX = cam.transformX(worldObjects[i].posX,scale);
     		int drawPosY = cam.transformY(worldObjects[i].posY,scale);
+    		
+    		//is alive?, is in view range
         	Image img = worldObjects[i].getImage();
-        	if (img != null)
-        	ctx.drawImage(img, drawPosX-32*scale,drawPosY-32*scale-16*scale,img.getWidth()*scale,img.getHeight()*scale);
+        	if (img == null) continue;	
+    		if (drawPosX < -img.getWidth()/2 || drawPosX > width + img.getWidth()/2 || drawPosY < -img.getHeight()/2)continue;
+    		else if (drawPosY > height+img.getHeight()/2)return;
+    		
+    		//drawGraphics
+        	ctx.drawImage(img, drawPosX-img.getWidth()/2*scale,drawPosY-img.getHeight()/2*scale,img.getWidth()*scale,img.getHeight()*scale);
     	}
 	}
 	

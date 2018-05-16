@@ -9,16 +9,12 @@ public class Node extends WorldObject{
 	private Node[] connections;
 	private Building[] buildings;
 
-	public Node(int posX,int posY) {
-		this(posX,posY,"");
-	}
-	public Node(int posX,int posY,Image img) {
+	public Node(int posX,int posY) {this(posX,posY,null,"");}
+	public Node(int posX,int posY,Image img) {this(posX,posY,img,"");}
+	public Node(int posX,int posY,String name) {this(posX,posY,null,name);}
+	
+	public Node(int posX,int posY,Image img,String name) {
 		super(posX,posY,img);
-		this.connections = new Node[10];
-		this.name = "";
-	}
-	public Node(int posX,int posY,String name) {
-		super(posX,posY);
 		this.connections = new Node[10];
 		this.name = name;
 	}
@@ -26,16 +22,18 @@ public class Node extends WorldObject{
 	public Node[] getConnections() {return connections;}
 	
 	private void conectToNode(Node refNode) {
-		int iConect = 0;
-		for (int i = 0;i<iConect;i++) if (connections[iConect]==refNode)return;
-		connections[iConect++] = refNode;
+		for (int i = 0;i<connections.length;i++) if (connections[i]==refNode)return;
+		Node[] newConnections = new Node[connections.length+1];
+		for (int i = 0;i<connections.length;i++)  
+			newConnections[i] = connections[i];
+		newConnections[connections.length] = refNode;
+		connections = newConnections;
 	}
 	public void conectWithNode(Node refNode) {
 		this.conectToNode(refNode);
 		refNode.conectToNode(this);
 	}
 	public void conectWithNodes(Node[] refNodes) {
-		connections = new Node[refNodes.length+1];
 		for (int i = 0;i<refNodes.length;i++) {
 			conectWithNode(refNodes[i]);
 		}

@@ -5,13 +5,16 @@ public class World {
 	
 	private Node[] nodes;
 	private WorldObject[][] decoLayers;
+	private Player[] players;
 	
+	private boolean[] arrayFinalized;
 	public World() {
 		this(new Node[0]);
 	}
 	public World(Node[] nodes) {
 		this.nodes = nodes;
 		decoLayers = new WorldObject[3][0];
+		arrayFinalized = new boolean[4];
 	}
 	
 	//WTF?
@@ -53,13 +56,14 @@ public class World {
 			}
 		} while (clutters != 0);
 	}
+	
 	public void finalProcessing() {
-		deepSorting(decoLayers[0]);
-		deepSorting(decoLayers[1]);
-		deepSorting(decoLayers[2]);
-		deepSorting(nodes);
+		if (!arrayFinalized[0])deepSorting(decoLayers[0]);
+		if (!arrayFinalized[1])deepSorting(decoLayers[1]);
+		if (!arrayFinalized[2])deepSorting(decoLayers[2]);
+		if (!arrayFinalized[3])deepSorting(nodes);
 	}
-
+	
 	public WorldObject[] getDeco(int layer) {
 		return decoLayers[layer];
 	}
@@ -89,11 +93,21 @@ public class World {
 	}
 	
 	public void Save(String path) {
+		byte[] data = null;
 		try {
-			new FileOutputStream(path).write(new byte[] {0,0});
+			FileOutputStream fos = new FileOutputStream(path);
+			DataOutputStream dos = new DataOutputStream(fos);
+			dos.close();
 		} catch (IOException e) {e.printStackTrace();}
 	}
 	public void Load(String path) {
-		
+		byte[] data = null;
+		try {
+			FileInputStream fis = new FileInputStream(path);
+			DataInputStream dis = new DataInputStream(fis);
+			
+			dis.close();
+
+		} catch (IOException e) {e.printStackTrace();}
 	}
 }

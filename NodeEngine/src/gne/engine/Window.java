@@ -11,6 +11,7 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.image.*;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.canvas.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcType;
@@ -21,6 +22,7 @@ public class Window {
 	private Stage primaryStage;
 	private Camera cam;
 	private Group root;
+	private Scene scene;
 	private Canvas canvas;
 	private GraphicsContext ctx;
 	
@@ -56,17 +58,23 @@ public class Window {
         primaryStage.setTitle("Game");
         root = new Group();	
         canvas = new Canvas(1920, 1080);
-        primaryStage.setScene(new Scene(root));
+        primaryStage.setScene(scene = new Scene(root));
 		ctx = canvas.getGraphicsContext2D();
         root.getChildren().add(canvas);  
         
 	}
 	private void addEvents() {
-		canvas.setOnKeyPressed(e -> {
-			//if (e.getCode() == KeyCode.LEFT) {
-				cam.addPos(100,0);
-			//}
+		
+		scene.setOnKeyPressed(e -> {
+			System.out.println("fcghj");
+			switch (e.getCode()) {
+				case RIGHT:cam.addPos(100,0);break;
+				case LEFT:cam.addPos(-100,0);break;
+				case UP:cam.addPos(0,-100);break;
+				case DOWN:cam.addPos(0,100);break;
+			}
 		});
+		
         canvas.setOnMouseDragged(e -> {
         	if (e.isPrimaryButtonDown()) {
         		cam.addPos(oldX-(int)e.getX(), oldY-(int)e.getY());
@@ -77,14 +85,25 @@ public class Window {
         	oldX = (int)e.getX();oldY=(int)e.getY();
         });
         
+        canvas.setOnMouseClicked(e -> {
+        	if (e.isPrimaryButtonDown());
+        	if (e.isSecondaryButtonDown());
+        	if (e.isMiddleButtonDown());
+        });
         canvas.setOnMousePressed(e -> {
         	if (e.isPrimaryButtonDown())pMouseDown = true;
         	if (e.isSecondaryButtonDown())pMouseDown = true;
         	if (e.isMiddleButtonDown())pMouseDown = true;
         });
         canvas.setOnScroll(e -> {
+        	double posX = -cam.posX + (e.getX()-canvas.getWidth()/2)/cam.scale;
+        	double posY = -cam.posY + (e.getY()-canvas.getHeight()/2)/cam.scale;
+        	
         	cam.addScale((float)e.getDeltaY());
-        	if (cam.scale>10)cam.scale=10f;
+        	if (cam.scale>1)cam.scale=1f;
+        	
+        	//shit!!!
+        	//cam.posX = (float)(-posX +(canvas.getWidth()/2*(e.getX()/canvas.getWidth()*2-1))/cam.scale);
         });
 	}
 

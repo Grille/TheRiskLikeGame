@@ -14,9 +14,16 @@ import javafx.scene.shape.ArcType;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
+/*
+public enum PlayerControl : Why?!
+{
+  Nothing,Human,Computer
+}
+*/
 public class Player {
 	
-	
+	private static int nextId;
+	int id;
 	public String name;
 	public Color color;
 	
@@ -24,13 +31,15 @@ public class Player {
 	
 	//Player = new
 	public Player() {
-		this.name = "player";
-		this.color = Color.GRAY;
+		this("player", Color.GRAY);
 	}
 	public Player(String name, Color color) {
 		this.name = name;
 		this.color = color;
+		id = nextId;
+		nextId++;
 	}
 }
+
 
 
