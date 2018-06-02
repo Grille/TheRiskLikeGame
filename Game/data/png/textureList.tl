@@ -1,0 +1,1 @@
+"deco/mountain.png"

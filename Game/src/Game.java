@@ -9,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.image.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.canvas.*;
+import javafx.scene.control.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcType;
 import javafx.stage.Stage;
@@ -16,7 +17,8 @@ import javafx.stage.Stage;
 public class Game extends Application{
 	NodeEngine nodeEngine;
 	Player[] players;
-	Image town,mount,ground;
+	Texture town,mount,ground;
+	
 	
 	public static void main(String[] args)  {
 		launch(args);
@@ -26,11 +28,21 @@ public class Game extends Application{
 	public void start(Stage primaryStage){
 		nodeEngine = new NodeEngine(primaryStage);
 		
+		Group root = nodeEngine.getWindow().getRoot();
+		Button h = new Button();
+		h.setText("hallo");
+		root.getChildren().add(h);
+		root.getScene();
+		
 		loadData();
 		initPlayer();
 
+		nodeEngine.getWindow().show(true);
 		nodeEngine.setWorld(initWorld());
-		nodeEngine.showWindow();
+		nodeEngine.getCamera().centerWorld();
+		nodeEngine.getRenderer().setBackColor(new Color(0.2,0.3,0.2,1));
+		nodeEngine.getRenderer().startRendering();
+		
 	}	
 	
 	private void initPlayer(){
@@ -41,16 +53,15 @@ public class Game extends Application{
 	}
 	
 	private void loadData(){
-    	String curPath = "file:"+this.getClass().getClassLoader().getResource("").getPath()+"\\..\\";
-    	town = new Image(curPath + "data/png/town/town.png");	
-    	mount = new Image(curPath + "data/png/deco/mountain.png");	
-    	ground = new Image(curPath + "data/png/deco/ground.png");	
+    	town = new Texture("file:/../data/png/town/town.png");	
+    	mount = new Texture("file:/../data/png/deco/mountain.png");	
+    	ground = new Texture("file:/../data/png/deco/ground.png");	
 	}
 	
 	private World initWorld() {
 		
 		Random rnd = new Random();
-		World world = new World();
+		World world = new World(3200,2000);
 	
 		Node[] nodes = new Node[]{
 			new Node(100*2,150*2,town,"Alaska"),//0
@@ -104,7 +115,7 @@ public class Game extends Application{
 		
 		
 
-		nodes[0].conectWithNodes(new Node[] {nodes[1],nodes[3],nodes[0]});
+		nodes[0].conectWithNodes(new Node[] {nodes[1],nodes[3],nodes[0],nodes[30]});
 		nodes[1].conectWithNodes(new Node[] {nodes[2],nodes[3],nodes[4]});
 		nodes[2].conectWithNodes(new Node[] {nodes[5],nodes[13]});
 		nodes[3].conectWithNodes(new Node[] {nodes[4],nodes[6]});
@@ -150,10 +161,16 @@ public class Game extends Application{
 		nodes[40].conectWithNodes(new Node[] {nodes[41]});
 
 		for (int i = 0;i< nodes.length;i++) {
-			if (rnd.nextFloat()<0.5f)
-			nodes[i].owner = players[0];
-			else
-		    nodes[i].owner = players[1];
+			float result = rnd.nextFloat();
+			if (result<0.5f)nodes[i].owner = null;
+			else if (result<0.75f)nodes[i].owner = players[0];
+			else nodes[i].owner = players[1];
+		}
+		
+		for (int i = 0;i< nodes.length;i++) {
+
+			nodes[i].units = (int)(rnd.nextFloat()*5+1);
+
 		}
 		/*
 		nodes[0].owner = nodes[1].owner = nodes[2].owner = nodes[3].owner = players[0];
@@ -162,8 +179,10 @@ public class Game extends Application{
 		
 		world.addNodes(nodes);
 
-		world.addDeco(new WorldObject(3200/2,1000,ground), 0);
+		//world.addDeco(new WorldObject(3200/2,1000,1f,ground), 0);
 		
+		world.backgroundImage = ground;
+		world.repeatX = true;
 		/*
 		for (int iy = 0;iy<200;iy++)
 		for (int ix = 0;ix<200;ix++) 

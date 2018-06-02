@@ -27,30 +27,32 @@ public class NodeEngine{
 	renderTimer.schedule(task , 10,20);
 	*/
 	
-	private Window window;
-	private Renderer renderer;
-	private Camera cam;
-	private World world;
-	
+	Window window;
+	Renderer renderer;
+	Camera camera;
+	World world;
+	Image images;
 	int inde = 0;
 	
 	Image img;	
 	
-	public void showWindow() {
-		window.show();
-		renderer.startRenderTimer(world, cam);
-	}
-	public void setWorld(World world) {
-		this.world = world;
-	}
-	public NodeEngine(Stage primaryStage)  {
-		String curPath = "file:"+this.getClass().getClassLoader().getResource("").getPath()+"\\..\\";
-		
-		cam = new Camera(primaryStage,0,0,1f);
-		window = new Window(primaryStage,cam);
-		renderer = new Renderer(primaryStage,window.getGraphicsContext());
+	static Stage primaryStage;
+	//static 
 	
-		
+	public void setWorld(World world) {
+		renderer.world = camera.world = this.world = world;
+	}
+	public World getWorld() {return world;}
+	public Renderer getRenderer() {return renderer;}
+	public Camera getCamera() {return camera;}
+	public Window getWindow() {return window;}
+	public NodeEngine(Stage primaryStage)  {
+		String curPath = this.getClass().getClassLoader().getResource("").getPath()+"/../";
+		NodeEngine.primaryStage = primaryStage;
+		camera = new Camera(primaryStage,0,0,1f);
+		window = new Window(primaryStage,camera);
+		renderer = new Renderer(primaryStage,window.getGraphicsContext());
+		renderer.cam = camera;
 	}
 
 }
