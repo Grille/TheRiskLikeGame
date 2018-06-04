@@ -48,8 +48,8 @@ public class Renderer {
             @Override
             public void handle(long now) {
             	render();
-            	if (cam.tilt > 0.5f)
-            		cam.tilt*=0.9f;
+            	//if (cam.tilt < 1)
+            		//cam.tilt+=0.1;
             }
         };
 	}
@@ -89,11 +89,14 @@ public class Renderer {
         	ctx.setFill(backColor);
         	ctx.fillRect(0, 0, width, height);
     	}
+    	
     	ms -= (int)System.currentTimeMillis();
+    	ctx.setFill(Color.LIME);
+    	ctx.fillOval(cam.transformX(cam.getCurrentPosX())-8, cam.transformY(cam.getCurrentPosY())-8, 16, 16);
 		ctx.setFill(Color.BLACK);
     	ctx.setFont(new Font("consolas", 15));
     	ctx.setTextAlign(TextAlignment.LEFT);
-    	ctx.fillText("Debug: "+ms + "\nFPS: "+fps, 0, 15);
+    	ctx.fillText("Debug: "+ms + "\nFPS: "+fps+"\nPosX: "+cam.getCurrentPosX(), 0, 15);
 	}
 	public void startRendering() {animationTimer.start();}
 	public void stopRendering() {animationTimer.stop();}
@@ -162,12 +165,13 @@ public class Renderer {
     		if (drawPosX < -img.getWidth()/2 || drawPosX > width + img.getWidth()/2 || drawPosY < -img.getHeight()/2)continue;
     		else if (drawPosY > height+img.getHeight()/2)return;
     		
-    		//draw ground/get color
-    		ctx.setFill(Color.WHITE);
-    		if (scale > 0.9)
-    		ctx.fillOval(drawPosX-32*scale, drawPosY-64*cam.tilt*scale/2, 64*scale, 64*cam.tilt*scale);
     		if (node.owner != null) {ctx.setFill(node.owner.color);ctx.setStroke(node.owner.color);}
     		else {ctx.setFill(Color.GRAY);ctx.setStroke(Color.GRAY);}
+    		//draw ground/get color
+    		//ctx.setFill(Color.WHITE);
+    		//if (scale > 0.9)
+    		ctx.fillOval(drawPosX-32*scale, drawPosY-64*cam.tilt*scale/2, 64*scale, 64*cam.tilt*scale);
+
         	ctx.setLineWidth(3*scale);
         	if (scale > 0.3)
         	ctx.strokeOval(drawPosX-32*scale, drawPosY-64*cam.tilt*scale/2, 64*scale, 64*cam.tilt*scale);
@@ -178,9 +182,10 @@ public class Renderer {
         	//node title/info
         	ctx.setFont(new Font("consolas", 15));
         	ctx.setTextAlign(TextAlignment.CENTER);
-        	if (scale > 0.5)ctx.fillText(node.name, drawPosX, drawPosY+32*scale+2);
+        	if (scale > 0.5)ctx.fillText(node.name, drawPosX, drawPosY+32/cam.tilt+20);
         	ctx.setTextAlign(TextAlignment.LEFT);
-        	if (node.owner != null && scale > 0.1)ctx.fillText(""+node.units, drawPosX + img.getWidth()/2*scale, drawPosY-32*scale+2);
+        	if (node.owner != null && scale > 0.1)
+        		ctx.fillText(""+node.units, drawPosX + img.getWidth()/2*scale, drawPosY-32*scale/cam.tilt+20);
     	}
 	}
 	private void drawObjects(WorldObject[] worldObjects) {

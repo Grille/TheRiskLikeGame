@@ -2,7 +2,7 @@ package gne;
 
 
 
-import java.awt.Point;
+import javafx.geometry.Point2D;
 import javafx.stage.Stage;
 
 public class Camera {
@@ -13,6 +13,8 @@ public class Camera {
 	float posX,posY;
 	float scale,tilt = 1f;
 	
+	int mouseX;
+	int mouseY;
 	public Camera(Stage primaryStage, float posX,float posY,float scale) {
 		this.stage = primaryStage;
 		this.posX = posX;this.posY = posY;this.scale = scale;
@@ -61,6 +63,44 @@ public class Camera {
 		setScale(this.scale += (scale*this.scale)/500);
 	}
 	
+	public int getCurrentPosX() {
+		int result = 0;
+		if (world != null) {
+			result = (int) ((mouseX-stage.getWidth()/2)/scale+posX);
+			while (result < 0)result += world.width;
+			while (result > world.width)result -= world.width;
+		}
+		return result;
+	}
+	public int getCurrentPosY() {
+		int result = 0;
+		if (world != null) {
+			result = (int) ((mouseY-stage.getHeight()/2)/scale+posY);
+			while (result < 0)result += world.height;
+			while (result > world.height)result -= world.height;
+		}
+		return result;
+	}
+	public Node getNextNode(int maxDist) {
+		Node result = null;
+		if (world != null) {
+			float lastDist = maxDist;
+			for (int i = 0;i<world.nodes.length;i++) {
+				float distX = getCurrentPosX() - world.nodes[i].posX;
+				float distY = getCurrentPosY() - world.nodes[i].posY;
+				float dist = (float)Math.sqrt(distX*distX+distY*distY);
+				if (dist<lastDist) {
+					lastDist = dist;
+					result = world.nodes[i];
+				}
+			}
+		}
+		return result;
+	}
+	public Point2D getMouseWorldPos() {
+		return new Point2D(0,0);
+		
+	}
 	//graphic transforms
 	int transformX(int posX) {
 		return (int)(((posX-this.posX)*scale)+stage.getWidth()/2);

@@ -70,7 +70,6 @@ public class Window {
 	private void addEvents() {
 		
 		scene.setOnKeyPressed(e -> {
-			System.out.println("fcghj");
 			switch (e.getCode()) {
 				case RIGHT:cam.addCamPos(100,0);break;
 				case LEFT:cam.addCamPos(-100,0);break;
@@ -85,18 +84,31 @@ public class Window {
         		cam.addCamPos(oldX-(int)e.getX(), oldY-(int)e.getY());
         	}
         	oldX = (int)e.getX();oldY=(int)e.getY();
+        	cam.mouseX = oldX;cam.mouseY=oldY;
         });
         canvas.setOnMouseMoved(e -> {
         	oldX = (int)e.getX();oldY=(int)e.getY();
+        	cam.mouseX = oldX;cam.mouseY=oldY;
         });
         
         canvas.setOnMouseClicked(e -> {
-        	if (e.isPrimaryButtonDown());
+			System.out.println("fcghj");
+    		
+        	if (e.isPrimaryButtonDown()) {
+
+        	}
         	if (e.isSecondaryButtonDown());
         	if (e.isMiddleButtonDown());
         });
         canvas.setOnMousePressed(e -> {
-        	if (e.isPrimaryButtonDown())pMouseDown = true;
+        	if (e.isPrimaryButtonDown()) {
+        		pMouseDown = true;
+        		Node node = cam.getNextNode(100);
+        		if (node != null) {
+        		node.owner = null;
+        		}
+        	}
+        	
         	if (e.isSecondaryButtonDown())pMouseDown = true;
         	if (e.isMiddleButtonDown())pMouseDown = true;
         });
@@ -106,6 +118,7 @@ public class Window {
         	
         	cam.addCamScale((float)e.getDeltaY());
         	if (cam.scale>1)cam.scale=1f;
+        	if (cam.scale<0.3)cam.scale=0.3f;
         	
         	cam.addPos(
         		(float)(cam.posX-(-posX +(canvas.getWidth()/2*(e.getX()/canvas.getWidth()*2-1))/cam.scale)),

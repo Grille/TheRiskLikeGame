@@ -27,6 +27,16 @@ public class Game extends Application{
 	@Override
 	public void start(Stage primaryStage){
 		nodeEngine = new NodeEngine(primaryStage);
+
+		loadData();
+		initPlayer();
+		
+		nodeEngine.getWindow().show(true);
+		nodeEngine.setWorld(initWorld());
+		nodeEngine.getCamera().centerWorld();
+		nodeEngine.getRenderer().setBackColor(new Color(0.2,0.3,0.2,1));
+		nodeEngine.getRenderer().startRendering();
+		
 		
 		Group root = nodeEngine.getWindow().getRoot();
 		Button h = new Button();
@@ -34,14 +44,7 @@ public class Game extends Application{
 		root.getChildren().add(h);
 		root.getScene();
 		
-		loadData();
-		initPlayer();
-
-		nodeEngine.getWindow().show(true);
-		nodeEngine.setWorld(initWorld());
-		nodeEngine.getCamera().centerWorld();
-		nodeEngine.getRenderer().setBackColor(new Color(0.2,0.3,0.2,1));
-		nodeEngine.getRenderer().startRendering();
+		
 		
 	}	
 	
