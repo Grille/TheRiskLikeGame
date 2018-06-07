@@ -5,11 +5,22 @@ import javafx.scene.image.Image;
 public class Node extends WorldObject{
 	
 	String name;
-	public Player owner;
+	Player owner;
 	Node[] connections;
 	Building[] buildings;
 	
+	int id;
+	int renderOption = 0;
 	public int units = 0;
+	
+	public void setOwner(Player set) {owner = set;}
+	public Player getOwner() {return owner;}
+	
+	public void setRenderOption(int set) {renderOption = set;}
+	public int getRenderOption() {return renderOption;}
+	
+	public void setUnits(int set) {units = set;}
+	public int getUnits() {return units;}
 
 	public Node(int posX,int posY) {this(posX,posY,null,"");}
 	public Node(int posX,int posY,Texture img) {this(posX,posY,img,"");}
@@ -19,7 +30,7 @@ public class Node extends WorldObject{
 		
 
 		super(posX,posY,img);
-		this.connections = new Node[10];
+		this.connections = new Node[0];
 		this.name = name;
 	}
 

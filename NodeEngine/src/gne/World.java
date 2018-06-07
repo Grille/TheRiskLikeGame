@@ -43,15 +43,19 @@ public class World {
 	
 	public void addDeco(WorldObject addDeco,int layer) {
 		addWorldObject(decoLayers[layer],decoLayers[layer]=new WorldObject[decoLayers[layer].length+1],addDeco);
+		arrayFinalized[layer] = false;
 	}
 	public void addDecos(WorldObject[] addDeco,int layer) {
 		addWorldObjects(decoLayers[layer],decoLayers[layer]=new WorldObject[decoLayers[layer].length+1],addDeco);
+		arrayFinalized[layer] = false;
 	}
 	public void addNode(Node addNode) {
 		addWorldObject(nodes,nodes = new Node[nodes.length+1],addNode);
+		arrayFinalized[3] = false;
 	}
 	public void addNodes(Node[] addNodes) {
 		addWorldObjects(nodes,nodes = new Node[nodes.length+addNodes.length],addNodes);
+		arrayFinalized[3] = false;
 	}
 
 	private <T extends WorldObject> void deepSorting(T[] cords) {
@@ -71,10 +75,23 @@ public class World {
 	}
 	
 	void finalProcessing() {
-		if (!arrayFinalized[0])deepSorting(decoLayers[0]);
-		if (!arrayFinalized[1])deepSorting(decoLayers[1]);
-		if (!arrayFinalized[2])deepSorting(decoLayers[2]);
-		if (!arrayFinalized[3])deepSorting(nodes);
+		if (!arrayFinalized[0]) {
+			deepSorting(decoLayers[0]);
+			arrayFinalized[0] = true;
+		}
+		if (!arrayFinalized[1]) {
+			deepSorting(decoLayers[1]);
+			arrayFinalized[1] = true;
+		}
+		if (!arrayFinalized[2]) {
+			deepSorting(decoLayers[2]);
+			arrayFinalized[2] = true;
+		}
+		if (!arrayFinalized[3]) {
+			deepSorting(nodes);
+			for (int i = 0;i<nodes.length;i++) nodes[i].id = i;
+			arrayFinalized[3] = true;
+		}
 	}
 	
 	public WorldObject[] getDeco(int layer) {
@@ -105,18 +122,52 @@ public class World {
 		}
 	}
 	
-	public void Save(String path) {
+	public void save(String path) {
 		byte[] data = null;
 		try {
-			FileOutputStream fos = new FileOutputStream(path);
-			DataOutputStream dos = new DataOutputStream(fos);
-			dos.close();
+			PrintWriter  pw = new PrintWriter(path);
+			pw.print(width+';');
+			pw.flush();
+			pw.close();
 		} catch (IOException e) {e.printStackTrace();}
 	}
-	public void LoadMapScript(String path) {
-		
+	public void saveMapScript(String path) {
+		finalProcessing();
+		try {
+			PrintWriter  pw = new PrintWriter(path);
+			pw.println("width:"+width);
+			pw.println("height:"+width);
+			pw.println("repeatX:"+repeatX);
+			pw.println("repeatY:"+repeatY);
+			
+			pw.println("\nNodes{");
+			for (int i = 0;i<nodes.length;i++) {
+				pw.print("  ("+nodes[i].posX+","+nodes[i].posY+","+0+","+nodes[i].name+")");
+				if (nodes[i].connections != null && nodes[i].connections.length > 0) {
+					pw.print("->["+nodes[i].connections[0].id);
+					for (int ic = 1;ic < nodes[i].connections.length;ic++) {
+						pw.print(","+nodes[i].connections[ic].id);
+					}
+					pw.print("]");
+				}
+				pw.print("\n");
+			}
+			pw.println("}");
+
+			pw.flush();
+			pw.close();
+
+		} catch (IOException e) {e.printStackTrace();}
 	}
-	public void Load(String path) {
+	public void loadMapScript(String path) {
+		try {
+			FileInputStream fis = new FileInputStream(path);
+			//System.out.println(fis.re);
+			
+			fis.close();
+		} catch (IOException e) {e.printStackTrace();}
+	}
+	public void load(String path) {
 		byte[] data = null;
 		try {
 			FileInputStream fis = new FileInputStream(path);

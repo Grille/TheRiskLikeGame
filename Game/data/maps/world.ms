@@ -8,13 +8,13 @@ RepeatY=0
 Nodes{
   (200,300,0,"Alaska")->[1,3,0,30] //0
   (500,280,0,"Northwest Territory")->[2,3,4]
-  (500*2,50*2,town,"Greenland")->[5,13]
-  (200*2,250*2,town,"Alberta")->[4,6]
-  (330*2,255*2,town,"Ontario")->[5,6,7]
-  (470*2,280*2,town,"Quebee")->[7]
-  (240*2,380*2,town,"Western States")->[7,8]
-  (370*2,390*2,town,"Eastern States")->[8]
-  (310*2,520*2,town,"Central America")->[9]
+  (1000,100,town,"Greenland")->[5,13]
+  (400,500,town,"Alberta")->[4,6]
+  (660,510,town,"Ontario")->[5,6,7]
+  (940,560,town,"Quebee")->[7]
+  (960,760,town,"Western States")->[7,8]
+  (740,780,town,"Eastern States")->[8]
+  (620,1040,town,"Central America")->[9]
 			
   (850,1220,town,"Venezuela")->[10,11]//9
   (880,1480,town,"Peru")->[11,12]//10

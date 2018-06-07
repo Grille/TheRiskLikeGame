@@ -3,20 +3,25 @@ package gne;
 
 
 import javafx.geometry.Point2D;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.stage.Stage;
 
 public class Camera {
 	
 	World world = null;
-	private Stage stage;
+	Canvas canvas = null;
 	
-	float posX,posY;
-	float scale,tilt = 1f;
+	public float posX,posY;
+	public float scale,tilt = 1f;
 	
-	int mouseX;
-	int mouseY;
-	public Camera(Stage primaryStage, float posX,float posY,float scale) {
-		this.stage = primaryStage;
+	public int mouseX;
+	public int mouseY;
+	public Camera() {
+		this(0,0,1);
+	}
+	public Camera(float posX,float posY,float scale) {
 		this.posX = posX;this.posY = posY;this.scale = scale;
 	}
 
@@ -56,17 +61,37 @@ public class Camera {
 	}
 	
 	//mouse move functions
-	void addCamPos(float posX, float posY) {
+	public void addScaledPos(float posX, float posY) {
 		setPos(this.posX+posX/scale,this.posY+posY/scale/tilt) ;
 	}
-	void addCamScale(float scale) {
-		setScale(this.scale += (scale*this.scale)/500);
+	
+	public void addMouseDrag(MouseEvent e) {
+		addScaledPos(mouseX-(int)e.getX(), mouseY-(int)e.getY());
+		mouseX = (int) e.getX();mouseY = (int) e.getY();
+	}
+	public void addMouseMove(MouseEvent e) {
+		mouseX = (int) e.getX();mouseY = (int) e.getY();
+	}
+	public void addScroll(ScrollEvent e) {
+    	double posX = -this.posX + (e.getX()-canvas.getWidth()/2)/this.scale;
+    	double posY = -this.posY + (e.getY()-canvas.getHeight()/2)/this.scale;
+    	
+		setScale(this.scale += ((float)e.getDeltaY()*this.scale)/500);
+    	if (this.scale>1)this.scale=1f;
+    	if (this.scale<0.3)this.scale=0.3f;
+    	
+    	this.addPos(
+    		(float)(this.posX-(-posX +(canvas.getWidth()/2*(e.getX()/canvas.getWidth()*2-1))/this.scale)),
+    		(float)(this.posY-(-posY +(canvas.getHeight()/2*(e.getY()/canvas.getHeight()*2-1))/this.scale))/this.tilt
+    	);
+    	
+    	
 	}
 	
 	public int getCurrentPosX() {
 		int result = 0;
 		if (world != null) {
-			result = (int) ((mouseX-stage.getWidth()/2)/scale+posX);
+			result = (int) ((mouseX-canvas.getWidth()/2)/scale+posX);
 			while (result < 0)result += world.width;
 			while (result > world.width)result -= world.width;
 		}
@@ -75,13 +100,13 @@ public class Camera {
 	public int getCurrentPosY() {
 		int result = 0;
 		if (world != null) {
-			result = (int) ((mouseY-stage.getHeight()/2)/scale+posY);
+			result = (int) ((mouseY-canvas.getHeight()/2)/scale+posY);
 			while (result < 0)result += world.height;
 			while (result > world.height)result -= world.height;
 		}
 		return result;
 	}
-	public Node getNextNode(int maxDist) {
+	public Node getNearestNode(int maxDist) {
 		Node result = null;
 		if (world != null) {
 			float lastDist = maxDist;
@@ -103,15 +128,15 @@ public class Camera {
 	}
 	//graphic transforms
 	int transformX(int posX) {
-		return (int)(((posX-this.posX)*scale)+stage.getWidth()/2);
+		return (int)(((posX-this.posX)*scale)+canvas.getWidth()/2);
 	}
 	int transformY(int posY) {
-		return (int)(((posY-this.posY)*scale*tilt)+stage.getHeight()/2);
+		return (int)(((posY-this.posY)*scale*tilt)+canvas.getHeight()/2);
 	}
 	int transformX(int posX,float scale) {
-		return (int)(((posX-this.posX)*scale)+stage.getWidth()/2);
+		return (int)(((posX-this.posX)*scale)+canvas.getWidth()/2);
 	}
 	int transformY(int posY,float scale) {
-		return (int)(((posY-this.posY)*scale*tilt)+stage.getHeight()/2);
+		return (int)(((posY-this.posY)*scale*tilt)+canvas.getHeight()/2);
 	}
 }

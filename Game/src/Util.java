@@ -1,68 +1,22 @@
-import gne.assets.*;
-import gne.*;
+import java.util.Random;
 
-import java.io.File;
-import java.util.*;
-import javafx.application.Application;
-import javafx.scene.Group;
-import javafx.scene.Scene;
-import javafx.scene.image.*;
-import javafx.scene.input.MouseButton;
-import javafx.scene.canvas.*;
-import javafx.scene.control.*;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.ArcType;
-import javafx.stage.Stage;
+import gne.Node;
+import gne.Texture;
+import gne.World;
 
-public class Game extends Application{
-	NodeEngine nodeEngine;
-	Player[] players;
-	Texture town,mount,ground;
-	
-	
-	public static void main(String[] args)  {
-		launch(args);
-	}
-
-	@Override
-	public void start(Stage primaryStage){
-		nodeEngine = new NodeEngine(primaryStage);
-
-		loadData();
-		initPlayer();
-		
-		nodeEngine.getWindow().show(true);
-		nodeEngine.setWorld(initWorld());
-		nodeEngine.getCamera().centerWorld();
-		nodeEngine.getRenderer().setBackColor(new Color(0.2,0.3,0.2,1));
-		nodeEngine.getRenderer().startRendering();
+public class Util {
+  private Util() {}
+  
+	static public World initWorld() {
 		
 		
-		Group root = nodeEngine.getWindow().getRoot();
-		Button h = new Button();
-		h.setText("hallo");
-		root.getChildren().add(h);
-		root.getScene();
+		Texture town,mount,ground;
 		
 		
-		
-	}	
-	
-	private void initPlayer(){
-		players = new Player[]{
-			new Player("player1",Color.BLUE),
-			new Player("player1",Color.RED)
-		};
-	}
-	
-	private void loadData(){
     	town = new Texture("file:/../data/png/town/town.png");	
     	mount = new Texture("file:/../data/png/deco/mountain.png");	
     	ground = new Texture("file:/../data/png/deco/ground.png");	
-	}
-	
-	private World initWorld() {
-		
+    	
 		Random rnd = new Random();
 		World world = new World(3200,2000);
 	
@@ -163,16 +117,18 @@ public class Game extends Application{
 		nodes[39].conectWithNodes(new Node[] {nodes[40],nodes[41]});
 		nodes[40].conectWithNodes(new Node[] {nodes[41]});
 
+		/*
 		for (int i = 0;i< nodes.length;i++) {
 			float result = rnd.nextFloat();
-			if (result<0.5f)nodes[i].owner = null;
-			else if (result<0.75f)nodes[i].owner = players[0];
+			//if (result<0.5f)nodes[i].owner = null;
+			if (result<0.5f)nodes[i].owner = players[0];
 			else nodes[i].owner = players[1];
 		}
+		*/
 		
 		for (int i = 0;i< nodes.length;i++) {
 
-			nodes[i].units = (int)(rnd.nextFloat()*5+1);
+			nodes[i].units = (int)(rnd.nextFloat()*0+5);
 
 		}
 		/*
@@ -199,5 +155,4 @@ public class Game extends Application{
 		*/
 		return world;
 	}
-	
 }
