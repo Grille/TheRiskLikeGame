@@ -16,23 +16,20 @@ import javafx.scene.shape.ArcType;
 import javafx.stage.Stage;
 
 
-public class Texture {
+public class Texture extends Image{
 	int id;
-	Image image = null;
 	String path;
 	
+	/*
 	public Texture() {
+		super();
 		this.path = "";
-		image = null;
 	}
+	*/
 	public Texture(String path) {
+		super(path);
 		this.path = path;
-		image = new Image(path);
 	}
 
 	public String getPath() {return path;}
-	public int getWidth() {return (int) image.getWidth();}
-	public int getHeight() {return (int) image.getHeight();}
-	
-	
 }

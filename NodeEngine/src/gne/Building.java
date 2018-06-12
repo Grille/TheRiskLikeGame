@@ -5,6 +5,8 @@ public class Building {
 	public String name;
 	public int costs;
 	public int[] prodoktion;
+	Texture texture;
+	
 	public Building () {
 		
 	}

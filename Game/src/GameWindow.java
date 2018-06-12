@@ -4,6 +4,7 @@ import gne.*;
 import java.io.File;
 import java.util.*;
 import javafx.application.Application;
+import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.image.*;
@@ -19,6 +20,7 @@ public class GameWindow extends Application{
 	Group root;
 	Scene scene;
 	Canvas canvas;
+	Button b1,b2;
 	Stage primaryStage;
 	Camera camera;
 	
@@ -38,11 +40,11 @@ public class GameWindow extends Application{
         canvas = new Canvas(1920, 1080);
         root.getChildren().add(canvas);   
         
-		Button b1 = new Button();
+		b1 = new Button();
 		b1.setStyle("-fx-font: 20 Unispace; -fx-base: #ee2211;border-radius: 8px;");
 		b1.setPrefWidth(200);b1.setText("Menu");
 		
-		Button b2 = new Button();
+		b2 = new Button();
 		b2.setStyle("-fx-font: 20 Unispace; -fx-base: #ee2211;border-radius: 8px;");
 		b2.setLayoutX(200);b2.setPrefWidth(200);b2.setText("Next Round");
 		
@@ -61,11 +63,16 @@ public class GameWindow extends Application{
 	
 	boolean pMouseDown,sMouseDown,mMouseDown;
 	private void addEvents() {
-
-		scene.setOnMouseDragged(e -> {
-			if (mMouseDown) camera.addMouseDrag(e);
-			});
-		scene.setOnMouseMoved(e -> {camera.addMouseMove(e);});
+		
+		canvas.setCursor(Cursor.CROSSHAIR);
+		
+		b2.setOnMouseClicked(e -> {
+			gameLogic.nextRound();
+			b2.setStyle("-fx-font: 20 Unispace; -fx-base: #fff;border-radius: 8px;");
+		});
+	
+		scene.setOnMouseDragged(e -> {if (mMouseDown) camera.addMouseDrag(e);});
+		scene.setOnMouseMoved(e -> {gameLogic.move();camera.addMouseMove(e);});
 		scene.setOnScroll(e -> {camera.addScroll(e);});
 		
 		scene.setOnMousePressed(e -> {
@@ -82,13 +89,17 @@ public class GameWindow extends Application{
         });
 		
 		scene.setOnKeyPressed(e -> {
-			switch (e.getCode()) {
+			gameLogic.isShiftDown = e.isShiftDown();
+			switch (e.getCode()){
 				case RIGHT:camera.addScaledPos(100,0);break;
 				case LEFT:camera.addScaledPos(-100,0);break;
 				case UP:camera.addScaledPos(0,-100);break;
 				case DOWN:camera.addScaledPos(0,100);break;
 				case Q:if(e.isControlDown())primaryStage.close();break;
 			}
+		});
+		scene.setOnKeyReleased(e -> {
+			gameLogic.isShiftDown = e.isShiftDown();
 		});
 		
 	}

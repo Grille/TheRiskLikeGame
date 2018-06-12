@@ -23,7 +23,7 @@ public class WorldObject  {
 	public void setImage(Texture img) {
 		this.img =  img;
 	}
-	public Texture getImage() {
+	public Texture getTexture() {
 		return img;
 	}
 }

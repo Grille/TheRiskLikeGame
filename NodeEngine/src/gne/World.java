@@ -1,7 +1,13 @@
 package gne;
 import java.io.*;
+import java.util.stream.Stream;
 
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.image.PixelReader;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.paint.Color;
 //NodeList
 public class World {
 	
@@ -10,10 +16,13 @@ public class World {
 	WorldObject[][] decoLayers;
 	Player[] players;
 	
+	Node[][] groups;
+	String[] groupNames;
+	
 	public boolean repeatX = false,repeatY = false;
 	Node[] conectionsDrawList;
 	
-	public Texture backgroundImage;
+	Texture backgroundImage;
 	
 	private boolean[] arrayFinalized;
 	public World() {
@@ -26,6 +35,8 @@ public class World {
 		this.width = width;
 		this.height = height;
 		this.nodes = nodes;
+		groups = new Node[0][];
+		groupNames = new String[0];
 		decoLayers = new WorldObject[3][0];
 		arrayFinalized = new boolean[4];
 	}
@@ -52,6 +63,19 @@ public class World {
 	public void addNode(Node addNode) {
 		addWorldObject(nodes,nodes = new Node[nodes.length+1],addNode);
 		arrayFinalized[3] = false;
+	}
+	public void addNodes(Node[] addNodes, String groupName) {
+		Node[][] newNodes = new Node[groups.length+1][];
+		String[] newNames = new String[groupNames.length+1];
+		for (int i = 0;i<groupNames.length;i++) {
+			newNodes[i] = groups[i];
+			newNames[i] = groupNames[i];
+		}
+		groups = newNodes;
+		groupNames = newNames;
+		groups[groups.length-1] = addNodes;
+		groupNames[groupNames.length-1] = groupName;
+		addNodes(addNodes);
 	}
 	public void addNodes(Node[] addNodes) {
 		addWorldObjects(nodes,nodes = new Node[nodes.length+addNodes.length],addNodes);
@@ -110,7 +134,36 @@ public class World {
 	public Node[] getNodes() {
 		return nodes;
 	}
-	
+	public Node[] getNodeGroup(String name) {
+		for (int i = 0;i<groupNames.length;i++) {
+			if (name == groupNames[i]) return groups[i];
+		}
+		return null;
+	}
+	public void setBackgroundGraphic(Texture background) {
+		
+		
+		backgroundImage = background;
+		/*
+		GraphicsContext gc = new Canvas(width,height).getGraphicsContext2D();
+		
+		Texture newBackground;
+		PixelReader reader = background.getPixelReader();
+		PixelWriter writer = gc.getPixelWriter();
+		
+		newBackground = gc.im;
+		/*
+		for (int ix = 0;ix<sw;ix++) {
+			for (int iy = 0;iy<sh;iy++) {
+				Color color = reader.getColor(sx+ix, sy+iy);
+				if (color.isOpaque()) {
+					writer.setColor(dx+ix, dy+iy, color);
+				}
+			}
+		}
+		*/
+		
+	}
 	public void killPlayer(Player deadPlayer) {
 		for (int i = 0;i<nodes.length;i++) {
 			if (nodes[i].owner == deadPlayer) nodes[i].owner = null;
@@ -121,12 +174,26 @@ public class World {
 			if (nodes[i].owner == oldPlayer) nodes[i].owner = newPlayer;
 		}
 	}
+	public int getNumberOfNodesOwnedByPlayer(Player player) {
+		int result = 0;
+		for (int i = 0;i<nodes.length;i++) {
+			if (nodes[i].owner == player)result++;
+		}
+		return result;
+	}
+	public boolean isNodesOwndedByPlayer(Node[] nodes,Player player) {
+		for (int i = 0;i<nodes.length;i++) {
+			if (nodes[i].getOwner() != player)return false;
+		}
+		return true;
+	}
 	
 	public void save(String path) {
 		byte[] data = null;
 		try {
 			PrintWriter  pw = new PrintWriter(path);
 			pw.print(width+';');
+			
 			pw.flush();
 			pw.close();
 		} catch (IOException e) {e.printStackTrace();}
@@ -135,6 +202,7 @@ public class World {
 		finalProcessing();
 		try {
 			PrintWriter  pw = new PrintWriter(path);
+			pw.println("backGround:"+backgroundImage.path);
 			pw.println("width:"+width);
 			pw.println("height:"+width);
 			pw.println("repeatX:"+repeatX);
@@ -161,11 +229,18 @@ public class World {
 	}
 	public void loadMapScript(String path) {
 		try {
-			FileInputStream fis = new FileInputStream(path);
-			//System.out.println(fis.re);
-			
-			fis.close();
-		} catch (IOException e) {e.printStackTrace();}
+			BufferedReader br = new BufferedReader(new FileReader("file:/../data/mp.txt"));
+			int count = 1; br.lines().count();
+			for (int i = 0;i<count;i++) {
+				System.out.println(br.readLine());
+			}
+			br.close();
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			System.out.println("tot!!!!!!!!!");
+			e.printStackTrace();
+		}
 	}
 	public void load(String path) {
 		byte[] data = null;

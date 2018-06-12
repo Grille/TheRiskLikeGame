@@ -26,8 +26,9 @@ public class Renderer {
 	//refs
 	Canvas canvas;
 	protected GraphicsContext gc;
-	World world;
-	Player[] players;
+	protected World world;
+	protected Player[] players;
+	protected Game game;
 	protected Camera camera;
 	
 	//render used
@@ -37,7 +38,7 @@ public class Renderer {
 	
 	//Options
 	Color backColor = Color.BLACK;
-	
+	Font nodeFont = new Font("consolas", 15);
 	//statistics
 	int fpsCounter=0,fps=0;
 	long fpsDelta=0;
@@ -56,10 +57,11 @@ public class Renderer {
 	
 	
 	public void setRenderSource(Game game,Camera camera) {
-		this.camera = camera;this.camera.canvas = canvas;this.camera.world = world = game.world;players = game.player;
+		this.game = game;this.camera = camera;this.camera.canvas = canvas;this.camera.world = world = game.world;players = game.player;
 	}
 	//set Options
 	public void setBackColor(Color set) {backColor = set;}
+	public void setNodeFont(Font font) {nodeFont = font;}
 	
 	//public render calls
 	public void render() {
@@ -95,20 +97,25 @@ public class Renderer {
     	}
     	
     	drawGUI((int)canvas.getWidth(),(int)canvas.getHeight());
+    	drawMouse(camera.mouseX,camera.mouseY);
+    	
+	
     	ms -= (int)System.currentTimeMillis();
     	gc.setFill(Color.LIME);
 		gc.setFill(Color.BLACK);
-    	gc.setFont(new Font("Unispace", 15));
+    	gc.setFont(new Font("consolas", 15));
     	gc.setTextAlign(TextAlignment.LEFT);
     	gc.fillText("Debug: "+ms + "\nFPS: "+fps+"\nPosX: "+camera.getCurrentPosX(), 0, 15+40);
     	
     	
-    	gc.fillText("X: "+camera.getNearestNode(9999).name, camera.mouseX, camera.mouseY+15);
+
 	}
 	public void startRendering() {animationTimer.start();}
 	public void stopRendering() {animationTimer.stop();}
 	
 	private void drawImage(Image img,int sx,int sy, int sw, int sh, int dx, int dy, int dw, int dh) {
+
+	//Canvas canfuck = new Canvas(width,height);
 		PixelReader reader = img.getPixelReader();
 		PixelWriter writer = gc.getPixelWriter();
 		for (int ix = 0;ix<sw;ix++) {
@@ -125,9 +132,9 @@ public class Renderer {
 	private void drawWorld(int posX,int posY) {
     	float oldX = camera.posX,oldY = camera.posY;
     	camera.posX += posX;camera.posY += posY;
-    	if (world.backgroundImage.image != null)
+    	if (world.backgroundImage != null)
     	gc.drawImage(
-    		world.backgroundImage.image
+    		world.backgroundImage
     		, 0, 0, world.backgroundImage.getWidth(), world.backgroundImage.getHeight()
     		, camera.transformX(0), camera.transformY(0), world.width*camera.scale+1, world.height*camera.scale*camera.tilt+1
     		);
@@ -151,21 +158,24 @@ public class Renderer {
     		for (int i2 = 0;i2<connections.length;i2++) {
     			if (connections[i2] == null)continue;
     			Node node1 = nodes[i1],node2 = connections[i2];
+    			
+    			// no double drawing
     			if (node1.posX<node2.posX)continue;
     			else if (node1.posX==node2.posX && node1.posY<node2.posY)continue;
+    			
     			int drawPosX1 = camera.transformX(node1.posX),drawPosY1 = camera.transformY(node1.posY),drawPosX2,drawPosY2;
+    			
     			if (world.repeatX && node1.posX-node2.posX<-world.width/2) drawPosX2 = camera.transformX(node2.posX-world.width);
     			else if (world.repeatX && node1.posX-node2.posX>world.width/2) drawPosX2 = camera.transformX(node2.posX+world.width);
     			else drawPosX2 = camera.transformX(node2.posX);
+    			
     			if (world.repeatY && node1.posY-node2.posY<-world.height/2) drawPosY2 = camera.transformY(node2.posY-world.height);
     			else if (world.repeatY && node1.posY-node2.posY>world.height/2) drawPosY2 = camera.transformY(node2.posY+world.height);
     			else drawPosY2 = camera.transformY(node2.posY);
+    			
+    			// 1/2 nodes visible
     			if ((drawPosX1<0||drawPosX1>width||drawPosY1<0||drawPosY1>height)&&(drawPosX2<0||drawPosX2>width||drawPosY2<0||drawPosY2>height)) continue;
-    			if (node1.owner != null && node1.owner == node2.owner) 
-    			gc.setStroke(new Color(node1.owner.color.getRed(),node1.owner.color.getGreen(),node1.owner.color.getBlue(),0.75f));
-    			else gc.setStroke(new Color(0.5f,0.5f,0.5f,0.5f));
-    			gc.setLineWidth(4*scale);
-    			gc.strokeLine(drawPosX1, drawPosY1, drawPosX2, drawPosY2);
+    			drawConection(node1,node2,drawPosX1, drawPosY1, drawPosX2, drawPosY2);
     		}
     	}
 	}
@@ -181,10 +191,11 @@ public class Renderer {
     		int drawPosY = camera.transformY(node.posY);
     		
     		//is alive?, is in view range
-        	Image img = node.getImage().image;
-        	if (img == null) continue;	
-    		if (drawPosX < -img.getWidth()/2 || drawPosX > width + img.getWidth()/2 || drawPosY < -img.getHeight()/2)continue;
-    		else if (drawPosY > height+img.getHeight()/2)return;
+        	Image img = node.getTexture();
+        	//if (img == null) continue;	
+        	int size = (int) (100 * camera.scale);
+    		if (drawPosX < -size|| drawPosX > width + size || drawPosY < -size)continue;
+    		else if (drawPosY > height+size)return;
     		
     		drawNode(node,drawPosX,drawPosY);
     	}
@@ -202,7 +213,7 @@ public class Renderer {
     		int drawPosY = camera.transformY(worldObjects[i].posY,scale);
     		
     		//is alive?, is in view range
-        	Image img = worldObjects[i].getImage().image;
+        	Image img = worldObjects[i].getTexture();
         	if (img == null) continue;	
     		if (drawPosX < -img.getWidth()/2 || drawPosX > width + img.getWidth()/2 || drawPosY < -img.getHeight()/2)continue;
     		else if (drawPosY > height+img.getHeight()/2)return;
@@ -213,10 +224,13 @@ public class Renderer {
 	}
 	
 	//protected render functions
+	protected void drawUnit(int drawPosX,int drawPosY) {
+		
+	}
 	protected void drawNode(Node node,int drawPosX,int drawPosY) {
 		float scale = camera.scale;
 		
-    	Image img = node.getImage().image;
+    	Image img = node.getTexture();
 		
 		Color nodeColor;
 		if (node.owner != null) nodeColor = node.owner.color;
@@ -229,14 +243,12 @@ public class Renderer {
 		gc.fillOval(drawPosX-size*scale/2, drawPosY-size*camera.tilt*scale/2, size*scale, size*camera.tilt*scale);
 
     		
-        if (node.renderOption == 1) {
-        	gc.setLineWidth(16*scale);
-        	gc.strokeOval(drawPosX-32*scale, drawPosY-64*camera.tilt*scale/2, 64*scale, 64*camera.tilt*scale);
-        }
-        else if (node.renderOption == 2) {
+		
+        if (node == camera.getNearestNode(70)) {
         	gc.setLineWidth(8*scale);
         	gc.strokeOval(drawPosX-32*scale, drawPosY-64*camera.tilt*scale/2, 64*scale, 64*camera.tilt*scale);
         }
+        
 		gc.setFill(Color.BLACK);
     	gc.setFont(new Font("unispace", 35*camera.scale));
     	gc.setTextAlign(TextAlignment.CENTER);
@@ -248,15 +260,31 @@ public class Renderer {
     	
     	//node title/info
 		gc.setStroke(Color.BLACK);gc.setFill(nodeColor);
-    	gc.setFont(new Font("unispace", 20*camera.scale));
+    	gc.setFont(nodeFont);
     	gc.setTextAlign(TextAlignment.CENTER);
     	if (scale > 0.5) {
-    		gc.fillText(node.name, drawPosX, drawPosY+64*camera.scale/camera.tilt);
+    		gc.fillText(node.name, drawPosX, drawPosY+48*camera.scale*camera.tilt+16);
     		gc.setLineWidth(1*scale);
     	}
 	}
+	protected void drawConection(Node node1,Node node2,int drawPosX1,int  drawPosY1,int  drawPosX2,int  drawPosY2) {
+		float scale = camera.scale;
+		if (node1.getOwner() != null && node1.getOwner() == node2.getOwner()) {
+			gc.setStroke(new Color(
+				node1.getOwner().getColor().getRed(),
+				node1.getOwner().getColor().getGreen(),
+				node1.getOwner().getColor().getBlue(),
+				0.75f)
+			);
+		}
+		else {
+			gc.setStroke(new Color(0.5f,0.5f,0.5f,0.5f));
+		}
+		gc.setLineWidth(4*scale);
+		gc.strokeLine(drawPosX1, drawPosY1, drawPosX2, drawPosY2);
+	}
 	protected void drawMouse(int drawPosX,int drawPosY) {
-		
+    	//gc.fillText("X: "+camera.getNearestNode(9999).posX, drawPosX, drawPosY);
 	}
 	protected void drawGUI(int width,int height){
 		

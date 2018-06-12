@@ -22,16 +22,13 @@ public class Game {
 	public void nextPlayer() {
 		if (activePlayer < player.length-1)activePlayer++;
 		else activePlayer = 0;
-		if (getNumberOfPlayerOwnedNodes(player[activePlayer]) == 0)nextPlayer();
+		if (world.getNumberOfNodesOwnedByPlayer(player[activePlayer]) == 0)nextPlayer();
 	}
 	public Player getActivePlayer() {
 		return player[activePlayer];
 	}
-	public int getNumberOfPlayerOwnedNodes(Player player) {
-		int result = 0;
-		for (int i = 0;i<world.nodes.length;i++) {
-			if (world.nodes[i].owner == player)result++;
-		}
-		return result;
+	public void setActivePlayer(Player player) {
+		activePlayer = player.id;
 	}
+	
 }
