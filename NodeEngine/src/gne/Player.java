@@ -21,17 +21,19 @@ public enum PlayerControl : Why?!
   Nothing,Human,Computer
 }
 */
+
 public class Player {
 	String name;
 	Color color;
 	int id;
-	int typ;//0 empty, 1 player, 2 KI
+	PlayerControl controlTyp;//0 empty, 1 player, 2 KI
 	
 	//Player = new
 	public Player() {
-		this("player", Color.GRAY);
+		this("player", Color.GRAY, PlayerControl.Empty);
 	}
-	public Player(String name, Color color) {
+	public Player(String name, Color color, PlayerControl typ) {
+		controlTyp = typ;
 		this.name = name;
 		this.color = color;
 	}
@@ -42,7 +44,11 @@ public class Player {
 	public Color getColor() {
 		return color;
 	}
+	public PlayerControl getControl() {
+		return controlTyp;
+	}
 }
+
 
 
 

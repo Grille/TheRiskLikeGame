@@ -65,14 +65,14 @@ public class Camera {
 		setPos(this.posX+posX/scale,this.posY+posY/scale/tilt) ;
 	}
 	
-	public void addMouseDrag(MouseEvent e) {
+	public void onMouseDrag(MouseEvent e) {
 		addScaledPos(mouseX-(int)e.getX(), mouseY-(int)e.getY());
 		mouseX = (int) e.getX();mouseY = (int) e.getY();
 	}
-	public void addMouseMove(MouseEvent e) {
+	public void onMouseMove(MouseEvent e) {
 		mouseX = (int) e.getX();mouseY = (int) e.getY();
 	}
-	public void addScroll(ScrollEvent e) {
+	public void onScroll(ScrollEvent e) {
     	double posX = -this.posX + (e.getX()-canvas.getWidth()/2)/this.scale;
     	double posY = -this.posY + (e.getY()-canvas.getHeight()/2)/this.scale;
     	

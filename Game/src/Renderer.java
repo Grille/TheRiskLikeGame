@@ -110,10 +110,10 @@ public class Renderer extends gne.Renderer {
 				if (gameLogic.gamePhase == 0)
 					text += "+\\"+selectetUnits;
 				else 
-					text += "->"+selectetUnits;
+					text += "<\\"+selectetUnits;
 			}
 			else if (gameLogic.gamePhase == 1) {
-				text += "->"+selectetUnits;
+				text += "<\\"+selectetUnits;
 				text += "\n  "+(int)(winChance*100)+"%";
 			}
 			else 
