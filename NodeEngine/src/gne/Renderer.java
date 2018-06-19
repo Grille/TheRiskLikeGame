@@ -229,16 +229,11 @@ public class Renderer {
 	}
 	protected void drawNode(Node node,int drawPosX,int drawPosY) {
 		float scale = camera.scale;
-		
     	Image img = node.getTexture();
-		
 		Color nodeColor;
 		if (node.owner != null) nodeColor = node.owner.color;
 		else nodeColor = Color.GRAY;
 		gc.setStroke(nodeColor);gc.setFill(nodeColor);
-		//draw ground/get color
-		//ctx.setFill(Color.WHITE);
-		//if (scale > 0.9)
 		float size = 58; 
 		gc.fillOval(drawPosX-size*scale/2, drawPosY-size*camera.tilt*scale/2, size*scale, size*camera.tilt*scale);
 

@@ -71,9 +71,15 @@ public class GameWindow extends Application{
 			b2.setStyle("-fx-font: 20 Unispace; -fx-base: #fff;border-radius: 8px;");
 		});
 	
-		scene.setOnMouseDragged(e -> {if (mMouseDown) camera.onMouseDrag(e);});
-		scene.setOnMouseMoved(e -> {gameLogic.move();camera.onMouseMove(e);});
-		scene.setOnScroll(e -> {camera.onScroll(e);});
+		scene.setOnMouseDragged(e -> {
+			if (mMouseDown) camera.onMouseDrag(e);
+			});
+		scene.setOnMouseMoved(e -> {
+			gameLogic.move();camera.onMouseMove(e);
+			});
+		scene.setOnScroll(e -> {
+			camera.onScroll(e);
+			});
 		
 		scene.setOnMousePressed(e -> {
         	if (e.isPrimaryButtonDown())pMouseDown = true;
