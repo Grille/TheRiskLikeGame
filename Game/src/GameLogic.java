@@ -42,7 +42,6 @@ public class GameLogic {
 		renderer.setBackColor(new Color(0.05,0.1,0.15,1));
 		camera = new Camera();
 		initGame(new Player[] {new Player()});
-		renderer.startRendering();	
 	}
 	public void initGame(Player[] player) {
 		world = Util.initWorld();
@@ -98,14 +97,15 @@ public class GameLogic {
 		return ret;
 	}
 	int maxEnemyUnits(Node node) {
-		return maxEnemyUnits(node,null);
+		return maxEnemyUnits(node,null,true);
 	}
-	int maxEnemyUnits(Node node,Node not) {
+	int maxEnemyUnits(Node node,Node not,boolean future) {
 		Node[] connections = node.getConnections();
 		Node node2 = connections[(int) (connections.length*Math.random())];
 		int maxEnemyUnits = 0;
 		for (int ic = 0;ic<connections.length;ic++) {
-			int enemyUnits = connections[ic].getUnits()+initUnits(connections[ic].getOwner());
+			int enemyUnits = connections[ic].getUnits();
+			if (future)enemyUnits+=initUnits(connections[ic].getOwner());
 			if (connections[ic] != not && connections[ic] != node2 && connections[ic].getOwner() != game.getActivePlayer() && maxEnemyUnits < enemyUnits)
 				maxEnemyUnits = enemyUnits;
 		}
@@ -147,149 +147,129 @@ public class GameLogic {
 	}
 	public void computerMove() {
 		Player player = game.getActivePlayer();
-		int[] list = randomIntList(world.getNodes().length);
-		
-		
-		for (int i = 0;i<list.length;i++) {
-			Node node = world.getNodes()[list[i]];
-			if (node.getUnits() <= 1 && node.getOwner() == player && world.isNodesContainsByPlayer(node.getConnections(), null)) {
-				addUnits(node,1);
-				break;
+		Player bigestEnemy = null;
+		int units = 0;
+		int[] list;
+		for (int i = 0;i<players.length;i++) {
+			int initUnits = initUnits(players[i]);
+			if (players[i]!=player && initUnits>units) {
+				bigestEnemy = players[i];
+				units = initUnits;
 			}
 		}
-		
-		
-		for (int i = 0;i<list.length;i++) {
-			Node node = world.getNodes()[list[i]];
-			if (node.getOwner() == player && node.getUnits() < maxEnemyUnits(node)+1) {
-				addUnits(node,maxEnemyUnits(node)-node.getUnits());
-			}
-		}
-		
-		for (int i = 0;i<list.length;i++) {
-			Node node = world.getNodes()[list[i]];
-			if (!world.isNodesOwndedByPlayer(node.getConnections(), player))
-			addUnits(node,selectetUnits);
-		}
-		
-		
-		for (int i = 0;i<list.length;i++) {
-			Node node = world.getNodes()[list[i]];
-			addUnits(node,selectetUnits);
-		}
-		
-		
-		
-		
+		// phase 1 distribute new units
 		list = randomIntList(world.getNodes().length);
-		for (int i = 0;i<list.length;i++) {
-			Node node = world.getNodes()[list[i]];
-			if (node.getOwner() == game.getActivePlayer() ) {
-				if (!world.isNodesOwndedByPlayer(node.getConnections(), player)) {	
-					Node[] connections = node.getConnections();
-					int[] listC = randomIntList(connections.length);
-					for (int ic = 0;ic<connections.length;ic++) {
-						Node node2 = connections[ic];
-						if (node2.getOwner() != null && node2.getOwner() != player) {
-							if (node.getUnits()>node2.getUnits()) {
-								selectNode(node);
-								selectNodeUnits(node,node2.getUnits()*2);
-								sendUnitsToNode(node,node2);
+		for (int i = 0;i<5;i++) {
+			for (int in = 0;in<list.length;in++) {
+				Node node = world.getNodes()[list[in]];
+				switch(i) {
+				case 0: // add 1 unit to unowned neighbor node
+					if (node.getUnits() <= 1 && node.getOwner() == player && world.isNodesContainsPlayer(node.getConnections(), null)) {
+						addUnits(node,1);
+						in = list.length;
+					}
+					break;
+				case 1:// add devend units to threatened node
+					if (node.getOwner() == player && node.getUnits() < maxEnemyUnits(node) && world.isNodesContainsPlayer(node.getConnections(), bigestEnemy)) {
+						addUnits(node,maxEnemyUnits(node)-node.getUnits()+1);
+					}
+					break;
+				case 2:// add devend units to threatened node
+					if (node.getOwner() == player && node.getUnits() < maxEnemyUnits(node)) {
+						addUnits(node,maxEnemyUnits(node)-node.getUnits()+1);
+					}
+					break;
+				case 3: // add remaining units to front node
+					if (node.getOwner() == player && maxEnemyUnits(node) > 0) {
+						addUnits(node,selectetUnits);
+					}
+					break;
+				case 4: // add remaining units to random node
+						addUnits(node,selectetUnits);
+					break;
+				}
+			}
+		}
+		// phase 2 attack nodes
+		list = randomIntList(world.getNodes().length);
+		for (int i = 0;i<2;i++) {
+			for (int in = 0;in<list.length;in++) {
+				Node node = world.getNodes()[list[in]];
+				if (node.getOwner() == game.getActivePlayer() ) {
+					if (!world.isNodesOwndedByPlayer(node.getConnections(), player)) {	
+						Node[] connections = node.getConnections();
+						int[] listC = randomIntList(connections.length);
+						for (int ic = 0;ic<connections.length;ic++) {
+							Node node2 = connections[ic];
+							int sendUnits = node2.getUnits();
+							switch (i) {
+							case 0: // risky attack dangerous player
+								if (maxEnemyUnits(node2)>sendUnits)
+									sendUnits = (int) (maxEnemyUnits(node2)*0.75f);
+								if (node2.getOwner() == bigestEnemy && node.getUnits()>=node2.getUnits()) {
+									if (node.getUnits()>node2.getUnits()) {
+										selectNode(node);
+										selectNodeUnits(node,sendUnits);
+										sendUnitsToNode(node,node2);
+									}
+								}
+								break;
+							case 1: // save attack other player
+								if (maxEnemyUnits(node2)>sendUnits)
+									sendUnits = (int) (maxEnemyUnits(node2)*0.75f);
+								if (node2.getOwner() != null && node2.getOwner() != player && maxEnemyUnits(node,node2,false) <= node.getUnits()-sendUnits) {
+									if (node.getUnits()>node2.getUnits()) {
+										selectNode(node);
+										selectNodeUnits(node,sendUnits);
+										sendUnitsToNode(node,node2);
+									}
+								}
+								break;
 							}
 						}
 					}
 				}
 			}
 		}
-		
-
-		
+		// phase 3 move units
 		list = randomIntList(world.getNodes().length);
-		for (int i = 0;i<list.length;i++) {
-			Node node = world.getNodes()[list[i]];
-			if (node.getOwner() == player) {
-				if (world.isNodesContainsByPlayer(node.getConnections(), null)) {	
-					Node[] connections = node.getConnections();
-					int[] listC = randomIntList(connections.length);
-					for (int ic = 0;ic<connections.length;ic++) {
-						Node node2 = connections[ic];
-						if (node2.getOwner() == null) {
-							selectNode(node);
-							selectNodeUnits(node,node.getUnits()/2);
-							sendUnitsToNode(node,node2);
+		for (int i = 0;i<3;i++) {
+			for (int in = 0;in<list.length;in++) {
+				Node node = world.getNodes()[list[in]];
+				if (node.getOwner() == player) {
+					if (world.isNodesContainsPlayer(node.getConnections(), null)) {	
+						Node[] connections = node.getConnections();
+						int[] listC = randomIntList(connections.length);
+						for (int ic = 0;ic<connections.length;ic++) {
+							Node node2 = connections[ic];
+							switch (i) {
+								case 0: // move to unowned node
+									if (node2.getOwner() == null) {
+										selectNode(node);
+										selectNodeUnits(node,node.getUnits()/2);
+										sendUnitsToNode(node,node2);
+									}
+								break;
+								case 1: // move to front node
+									if (node2.getOwner() == player && !world.isNodesOwndedByPlayer(node2.getConnections(), player)) {
+										selectNode(node);
+										selectNodeUnits(node,node.getUnits());
+										sendUnitsToNode(node,node2);
+									}
+								break;
+								case 2: // move to random node
+									if (node2.getOwner() == player) {
+										selectNode(node);
+										selectNodeUnits(node,node.getUnits());
+										sendUnitsToNode(node,node2);
+									}
+								break;
+							}
 						}
 					}
 				}
 			}
 		}
-		for (int i = 0;i<list.length;i++) {
-			Node node = world.getNodes()[list[i]];
-			if (node.getOwner() == player) {
-				if (world.isNodesOwndedByPlayer(node.getConnections(), player)) {	
-					Node[] connections = node.getConnections();
-					int[] listC = randomIntList(connections.length);
-					for (int ic = 0;ic<connections.length;ic++) {
-						Node node2 = connections[ic];
-						if (node2.getOwner() == player && !world.isNodesOwndedByPlayer(node2.getConnections(), player)) {
-							selectNode(node);
-							selectNodeUnits(node,node.getUnits());
-							sendUnitsToNode(node,node2);
-						}
-					}
-				}
-			}
-		}
-		for (int i = 0;i<list.length;i++) {
-			Node node = world.getNodes()[list[i]];
-			if (node.getOwner() == player) {
-				if (world.isNodesOwndedByPlayer(node.getConnections(), player)) {	
-					Node[] connections = node.getConnections();
-					int[] listC = randomIntList(connections.length);
-					for (int ic = 0;ic<connections.length;ic++) {
-						Node node2 = connections[ic];
-						if (node2.getOwner() == player) {
-							selectNode(node);
-							selectNodeUnits(node,node.getUnits());
-							sendUnitsToNode(node,node2);
-						}
-					}
-				}
-			}
-		}
-		/*
-		tryNumber = 0;
-		while (gamePhase == 1 && tryNumber < 100) {
-			tryNumber++;
-			Node node = world.getNodes()[(int) (world.getNodes().length*Math.random())];
-			Node[] connections = node.getConnections();
-			if (node.getOwner() == game.getActivePlayer()) {
-				Node node2 = connections[(int) (connections.length*Math.random())];
-				int maxEnemyUnits = 2;
-				for (int ic = 0;ic<connections.length;ic++) {
-					if (connections[ic] != node2 && connections[ic].getOwner() != game.getActivePlayer() && maxEnemyUnits < connections[ic].getUnits())maxEnemyUnits = connections[ic].getUnits();
-				}
-				if (node2.getOwner() == null) {
-					selectNode(node);
-					selectNodeUnits(node,(int)(node.getUnits()-maxEnemyUnits));
-					sendUnitsToNode(node,node2);
-				}
-			}
-		}
-		
-		tryNumber = 0;
-		while (gamePhase == 1 && tryNumber < 100) {
-			tryNumber++;
-			Node node = world.getNodes()[(int) (world.getNodes().length*Math.random())];
-			if (node.getOwner() == game.getActivePlayer() && world.isNodesOwndedByPlayer(node.getConnections(), game.getActivePlayer())) {
-				Node node2 = node.getConnections()[(int) (node.getConnections().length*Math.random())];
-				selectNode(node);
-				selectNodeUnits(node,(int)(node.getUnits()));
-				sendUnitsToNode(node,node2);
-			}
-		}
-		
-
-		*/
 		nextRound();
 	}
 	public void click (boolean pMbt,boolean sMbt,boolean mMbt) {

@@ -181,7 +181,7 @@ public class World {
 		}
 		return result;
 	}
-	public boolean isNodesContainsByPlayer(Node[] nodes,Player player) {
+	public boolean isNodesContainsPlayer(Node[] nodes,Player player) {
 		for (int i = 0;i<nodes.length;i++) {
 			if (nodes[i].getOwner() == player)return true;
 		}

@@ -101,18 +101,19 @@ public class GameWindow extends Application{
 	        ((ChoiceBox<String>)secondScene.lookup("#cb5")).getSelectionModel().select(2);
 	        ((ChoiceBox<String>)secondScene.lookup("#cb6")).getSelectionModel().select(2);
 	        
-	        ((ColorPicker)secondScene.lookup("#cp1")).setValue(Color.BLUE);
-	        ((ColorPicker)secondScene.lookup("#cp2")).setValue(Color.RED);
-	        ((ColorPicker)secondScene.lookup("#cp3")).setValue(Color.GREEN);
-	        ((ColorPicker)secondScene.lookup("#cp4")).setValue(Color.YELLOW);
-	        ((ColorPicker)secondScene.lookup("#cp5")).setValue(Color.DEEPPINK);
-	        ((ColorPicker)secondScene.lookup("#cp6")).setValue(Color.TURQUOISE);
+	        ((ColorPicker)secondScene.lookup("#cp1")).setValue(Color.web("#1a3399"));
+	        ((ColorPicker)secondScene.lookup("#cp2")).setValue(Color.web("#b31a1a"));
+	        ((ColorPicker)secondScene.lookup("#cp3")).setValue(Color.web("#1a4d1a"));
+	        ((ColorPicker)secondScene.lookup("#cp4")).setValue(Color.web("#b3b31a"));
+	        ((ColorPicker)secondScene.lookup("#cp5")).setValue(Color.web("#4d1a4d"));
+	        ((ColorPicker)secondScene.lookup("#cp6")).setValue(Color.web("#336666"));
 	        ((Button)secondScene.lookup("#bClose")).setOnMouseClicked(e -> {
 	        	Runtime.getRuntime().exit(0);
 			});
 	        ((Button)secondScene.lookup("#bCancel")).setOnMouseClicked(e -> {
 	        	secondStage.hide();
 	        	primaryStage.show();
+	        	gameLogic.renderer.startRendering();	
 			});
 	        ((Button)secondScene.lookup("#bStart")).setOnMouseClicked(e -> {
 	        	
@@ -128,6 +129,7 @@ public class GameWindow extends Application{
 	    		gameLogic.initGame(player);
 	        	secondStage.hide();
 	        	primaryStage.show();
+	        	gameLogic.renderer.startRendering();	
 			});
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -144,6 +146,7 @@ public class GameWindow extends Application{
 		b1.setOnMouseClicked(e -> {
 			primaryStage.hide();
 			secondStage.show();
+			gameLogic.renderer.stopRendering();	
 		});
 		b2.setOnMouseClicked(e -> {
 			gameLogic.nextRound();
