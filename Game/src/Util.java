@@ -11,7 +11,7 @@ public class Util {
 
 		Texture town,mount,ground;
 		
-    	town = new Texture("file:/../data/png/town/town.png");	
+    	town = new Texture("file:/../data/png/town.png");	
 
     	
 		Random rnd = new Random();
@@ -124,7 +124,7 @@ public class Util {
 		world.addNodes(as,"as");
 		world.addNodes(au,"au");
 
-		world.setBackgroundGraphic(new Texture("file:/../data/png/deco/ground.png"));
+		world.setBackgroundGraphic(new Texture("file:/../data/png/ground.png"));
 		world.repeatX = true;
 
 

@@ -15,7 +15,7 @@ public class Renderer extends gne.Renderer {
 	public Renderer(Canvas canvas,GameLogic gameLogic) {
 		super(canvas);
 		this.gameLogic = gameLogic;
-		nodeTexture = new Texture("file:/../data/png/town/town.png");
+		nodeTexture = new Texture("file:/../data/png/town.png");
 		// TODO Auto-generated constructor stub
 	}
 	

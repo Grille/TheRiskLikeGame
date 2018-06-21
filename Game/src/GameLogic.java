@@ -1,5 +1,6 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -36,22 +37,23 @@ public class GameLogic {
 	Random rnd;
 	
 	public GameLogic(Canvas canvas) {
+		rnd = new Random();
 		renderer = new Renderer(canvas,this);
 		renderer.setBackColor(new Color(0.05,0.1,0.15,1));
-		world = Util.initWorld();
-		players = initPlayer();
 		camera = new Camera();
+		initGame(new Player[] {new Player()});
+		renderer.startRendering();	
+	}
+	public void initGame(Player[] player) {
+		world = Util.initWorld();
+		players = player;
 		game = new Game(world,players);
 		renderer.setRenderSource(game,camera);
 		camera.centerWorld();
-		renderer.startRendering();
-		
-		rnd = new Random(110);
-
-		//int world
 		int sa = world.getNodes().length/players.length;
 		for (int i = 0;i<1;i++) {
 			for (int ip = 0;ip<players.length;ip++) {
+				if (player[ip].getControl() == PlayerControl.Empty) continue;
 				Node node;
 				while (true) {
 					node = world.getNodes()[(int)(Math.random()*world.getNodes().length)];
@@ -64,6 +66,7 @@ public class GameLogic {
 					}
 					
 					
+					
 					if (isAlone) {
 						break;
 					}
@@ -72,23 +75,9 @@ public class GameLogic {
 				node.setUnits(1);
 			}
 		}
-		world.saveMapScript("file:/../data/maps/test.nms");
-		world.loadMapScript("file:/../data/maps/test.nms");
 		initRound();
-		
-		
 	}
-	private Player[] initPlayer(){
-		return new Player[]{
-			new Player("player1",Color.BLUE,PlayerControl.Human),
-			new Player("player2",Color.RED,PlayerControl.Computer),
-			new Player("player3",Color.GREEN,PlayerControl.Computer),
-			new Player("player4",Color.YELLOW,PlayerControl.Computer),
-			new Player("player5",Color.DEEPPINK,PlayerControl.Computer),
-			new Player("player6",Color.TURQUOISE,PlayerControl.Computer)
-		};
-	}
-	
+
 	int[] randomIntList(int max) {
 		int[] ret = new int[max];
 		for (int i = 0;i< ret.length;i++) {
@@ -116,7 +105,9 @@ public class GameLogic {
 		Node node2 = connections[(int) (connections.length*Math.random())];
 		int maxEnemyUnits = 0;
 		for (int ic = 0;ic<connections.length;ic++) {
-			if (connections[ic] != not && connections[ic] != node2 && connections[ic].getOwner() != game.getActivePlayer() && maxEnemyUnits < connections[ic].getUnits())maxEnemyUnits = connections[ic].getUnits();
+			int enemyUnits = connections[ic].getUnits()+initUnits(connections[ic].getOwner());
+			if (connections[ic] != not && connections[ic] != node2 && connections[ic].getOwner() != game.getActivePlayer() && maxEnemyUnits < enemyUnits)
+				maxEnemyUnits = enemyUnits;
 		}
 		return maxEnemyUnits;
 	}
@@ -139,16 +130,20 @@ public class GameLogic {
 		selectNode(null);
 		gamePhase = 0;
 		
-		selectetUnits = (int)(world.getNumberOfNodesOwnedByPlayer(game.getActivePlayer())/3);
-		if (world.isNodesOwndedByPlayer(world.getNodeGroup("na"), game.getActivePlayer())) selectetUnits+=5;
-		if (world.isNodesOwndedByPlayer(world.getNodeGroup("sa"), game.getActivePlayer())) selectetUnits+=2;
-		if (world.isNodesOwndedByPlayer(world.getNodeGroup("eu"), game.getActivePlayer())) selectetUnits+=5;
-		if (world.isNodesOwndedByPlayer(world.getNodeGroup("af"), game.getActivePlayer())) selectetUnits+=3;
-		if (world.isNodesOwndedByPlayer(world.getNodeGroup("as"), game.getActivePlayer())) selectetUnits+=7;
-		if (world.isNodesOwndedByPlayer(world.getNodeGroup("au"), game.getActivePlayer())) selectetUnits+=2;
-		if (selectetUnits < 3) selectetUnits = 3;
-		
+		selectetUnits = initUnits(game.getActivePlayer());
 		if (game.getActivePlayer().getControl() == PlayerControl.Computer)computerMove();
+	}
+	public int initUnits(Player player) {
+		if (player == null)return 0;
+		int selectetUnits = (int)(world.getNumberOfNodesOwnedByPlayer(player)/3);
+		if (world.isNodesOwndedByPlayer(world.getNodeGroup("na"), player)) selectetUnits+=5;
+		if (world.isNodesOwndedByPlayer(world.getNodeGroup("sa"), player)) selectetUnits+=2;
+		if (world.isNodesOwndedByPlayer(world.getNodeGroup("eu"), player)) selectetUnits+=5;
+		if (world.isNodesOwndedByPlayer(world.getNodeGroup("af"), player)) selectetUnits+=3;
+		if (world.isNodesOwndedByPlayer(world.getNodeGroup("as"), player)) selectetUnits+=7;
+		if (world.isNodesOwndedByPlayer(world.getNodeGroup("au"), player)) selectetUnits+=2;
+		if (selectetUnits < 3) selectetUnits = 3;
+		return selectetUnits;
 	}
 	public void computerMove() {
 		Player player = game.getActivePlayer();
@@ -157,8 +152,9 @@ public class GameLogic {
 		
 		for (int i = 0;i<list.length;i++) {
 			Node node = world.getNodes()[list[i]];
-			if (node.getOwner() == player && world.isNodesContainsByPlayer(node.getConnections(), null)) {
+			if (node.getUnits() <= 1 && node.getOwner() == player && world.isNodesContainsByPlayer(node.getConnections(), null)) {
 				addUnits(node,1);
+				break;
 			}
 		}
 		
@@ -188,17 +184,16 @@ public class GameLogic {
 		list = randomIntList(world.getNodes().length);
 		for (int i = 0;i<list.length;i++) {
 			Node node = world.getNodes()[list[i]];
-			if (node.getOwner() == game.getActivePlayer()) {
+			if (node.getOwner() == game.getActivePlayer() ) {
 				if (!world.isNodesOwndedByPlayer(node.getConnections(), player)) {	
 					Node[] connections = node.getConnections();
 					int[] listC = randomIntList(connections.length);
 					for (int ic = 0;ic<connections.length;ic++) {
 						Node node2 = connections[ic];
 						if (node2.getOwner() != null && node2.getOwner() != player) {
-							int senUnits = node2.getUnits()+2;
-							if (node.getUnits()>=senUnits) {
+							if (node.getUnits()>node2.getUnits()) {
 								selectNode(node);
-								selectNodeUnits(node,senUnits);
+								selectNodeUnits(node,node2.getUnits()*2);
 								sendUnitsToNode(node,node2);
 							}
 						}
@@ -221,6 +216,23 @@ public class GameLogic {
 						if (node2.getOwner() == null) {
 							selectNode(node);
 							selectNodeUnits(node,node.getUnits()/2);
+							sendUnitsToNode(node,node2);
+						}
+					}
+				}
+			}
+		}
+		for (int i = 0;i<list.length;i++) {
+			Node node = world.getNodes()[list[i]];
+			if (node.getOwner() == player) {
+				if (world.isNodesOwndedByPlayer(node.getConnections(), player)) {	
+					Node[] connections = node.getConnections();
+					int[] listC = randomIntList(connections.length);
+					for (int ic = 0;ic<connections.length;ic++) {
+						Node node2 = connections[ic];
+						if (node2.getOwner() == player && !world.isNodesOwndedByPlayer(node2.getConnections(), player)) {
+							selectNode(node);
+							selectNodeUnits(node,node.getUnits());
 							sendUnitsToNode(node,node2);
 						}
 					}
