@@ -64,13 +64,9 @@ public class GameWindow extends Application{
         
 		addEvents();
 	
-        
-        //primaryStage.show();
         primaryStage.setFullScreenExitHint("");
         primaryStage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
         primaryStage.setFullScreen(true);
-        
-        //root.getChildren().add(secondLabel);
         
         startSecond();
         
