@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.web.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.canvas.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="381.0" prefWidth="635.0" styleClass="_background" stylesheets="@style.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Canvas id="canvas" height="40.0" width="40.0" AnchorPane.bottomAnchor="-19.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="235.0" AnchorPane.topAnchor="0.0" />
+      <HBox alignment="CENTER" layoutX="97.0" prefHeight="57.0" prefWidth="538.0" AnchorPane.leftAnchor="97.0" AnchorPane.rightAnchor="0.0">
+         <children>
+            <Pane prefHeight="57.0" prefWidth="281.0">
+               <children>
+                  <Button id="bNext" layoutX="14.0" layoutY="15.0" mnemonicParsing="false" style="-fx-font-size: 20;" styleClass="_gui" text="Round 1 : Next" />
+               </children>
+            </Pane>
+         </children>
+      </HBox>
+      <Button id="bMenu" layoutX="13.0" layoutY="16.0" mnemonicParsing="false" style="-fx-font-size: 20;" styleClass="_gui" text="Menu" />
+   </children>
+</AnchorPane>

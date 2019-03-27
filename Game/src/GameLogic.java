@@ -125,11 +125,12 @@ public class GameLogic {
 		selectNode(null);
 		game.nextPlayer();
 		initRound();
+		//renderer.render();
 	}
 	public void initRound() {	
 		selectNode(null);
 		gamePhase = 0;
-		
+
 		selectetUnits = initUnits(game.getActivePlayer());
 		if (game.getActivePlayer().getControl() == PlayerControl.Computer)computerMove();
 	}
@@ -273,6 +274,7 @@ public class GameLogic {
 		nextRound();
 	}
 	public void click (boolean pMbt,boolean sMbt,boolean mMbt) {
+		//if (camera.moving) return;
 		Node node = camera.getNearestNode(70);
 		if (gamePhase == 0) {
 			if (pMbt || sMbt) {

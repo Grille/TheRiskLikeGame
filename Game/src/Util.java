@@ -125,6 +125,7 @@ public class Util {
 		world.addNodes(au,"au");
 
 		world.setBackgroundGraphic(new Texture("file:/../data/png/ground.png"));
+		world.setWaterGraphic(new Texture("file:/../data/png/water.png"));
 		world.repeatX = true;
 
 

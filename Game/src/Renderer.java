@@ -12,10 +12,13 @@ public class Renderer extends gne.Renderer {
 	float winChance = 0f;
 	GameLogic gameLogic;
 	Texture nodeTexture;
+	Texture waterTexture;
 	public Renderer(Canvas canvas,GameLogic gameLogic) {
 		super(canvas);
 		this.gameLogic = gameLogic;
 		nodeTexture = new Texture("file:/../data/png/town.png");
+		waterTexture = new Texture("file:/../data/png/water.png");
+		//nodeTexture = waterTexture;
 		// TODO Auto-generated constructor stub
 	}
 	
@@ -61,7 +64,7 @@ public class Renderer extends gne.Renderer {
         	}
         }
 		gc.setFill(Color.BLACK);
-    	gc.setFont(new Font("unispace", 35*camera.scale));
+    	gc.setFont(new Font("Impact", 35*camera.scale));
     	gc.setTextAlign(TextAlignment.CENTER);
     	if (node.getOwner() != null && scale > 0.1) gc.fillText(""+(units), drawPosX, drawPosY+14*camera.scale);
         	
@@ -70,7 +73,7 @@ public class Renderer extends gne.Renderer {
     	
     	//node title/info
 		gc.setStroke(Color.BLACK);gc.setFill(nodeColor);
-    	gc.setFont(new Font("unispace", 20*camera.scale));
+    	gc.setFont(new Font("Impact", 20*camera.scale));
     	gc.setTextAlign(TextAlignment.CENTER);
     	if (scale > 0.5) {
     		gc.fillText(node.getName(), drawPosX, drawPosY+64*camera.scale/camera.tilt);
@@ -87,7 +90,7 @@ public class Renderer extends gne.Renderer {
 		
 		String text = "";
 		
-    	gc.setFont(Font.font("unispace", FontWeight.BOLD, 30));
+    	gc.setFont(Font.font("consolas", FontWeight.BOLD, 30));
     	gc.setTextAlign(TextAlignment.LEFT);
     	
     	gc.setStroke(game.getActivePlayer().getColor());

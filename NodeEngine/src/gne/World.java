@@ -23,6 +23,7 @@ public class World {
 	Node[] conectionsDrawList;
 	
 	Texture backgroundImage;
+	Texture waterImage;
 	
 	private boolean[] arrayFinalized;
 	public World() {
@@ -98,7 +99,7 @@ public class World {
 		} while (clutters != 0);
 	}
 	
-	void finalProcessing() {
+	void deepSorting() {
 		if (!arrayFinalized[0]) {
 			deepSorting(decoLayers[0]);
 			arrayFinalized[0] = true;
@@ -141,28 +142,10 @@ public class World {
 		return null;
 	}
 	public void setBackgroundGraphic(Texture background) {
-		
-		
 		backgroundImage = background;
-		/*
-		GraphicsContext gc = new Canvas(width,height).getGraphicsContext2D();
-		
-		Texture newBackground;
-		PixelReader reader = background.getPixelReader();
-		PixelWriter writer = gc.getPixelWriter();
-		
-		newBackground = gc.im;
-		/*
-		for (int ix = 0;ix<sw;ix++) {
-			for (int iy = 0;iy<sh;iy++) {
-				Color color = reader.getColor(sx+ix, sy+iy);
-				if (color.isOpaque()) {
-					writer.setColor(dx+ix, dy+iy, color);
-				}
-			}
-		}
-		*/
-		
+	}
+	public void setWaterGraphic(Texture water) {
+		waterImage = water;
 	}
 	public void killPlayer(Player deadPlayer) {
 		for (int i = 0;i<nodes.length;i++) {
@@ -205,7 +188,7 @@ public class World {
 		} catch (IOException e) {e.printStackTrace();}
 	}
 	public void saveMapScript(String path) {
-		finalProcessing();
+		deepSorting();
 		try {
 			PrintWriter  pw = new PrintWriter(path);
 			pw.println("backGround:"+backgroundImage.path);

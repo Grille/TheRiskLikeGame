@@ -1,4 +1,4 @@
-import gne.assets.*;
+//import gne.assets.*;
 import gne.*;
 
 import java.io.File;
@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
@@ -24,7 +26,7 @@ import javafx.scene.shape.ArcType;
 import javafx.stage.Stage;
 
 public class GameWindow extends Application{
-	Group root;
+	Parent root;
 	Scene scene;
 	Canvas canvas;
 	Button b1,b2;
@@ -42,24 +44,8 @@ public class GameWindow extends Application{
 	public void start(Stage primaryStage){
 		secondStage = null;
 		this.primaryStage = primaryStage;
-        primaryStage.setTitle("Game");
-        root = new Group();	
-        primaryStage.setScene(scene = new Scene(root));
-        
-        canvas = new Canvas(1920, 1080);
-        root.getChildren().add(canvas);   
-        
-		b1 = new Button();
-		b1.setStyle("-fx-font: 20 Unispace;");
-		b1.setPrefWidth(200);b1.setText("Menu");
-		
-		b2 = new Button();
-		b2.setStyle("-fx-font: 20 Unispace;");
-		b2.setLayoutX(200);b2.setPrefWidth(200);b2.setText("Next Round");
-		
-		root.getChildren().add(b1);
-		root.getChildren().add(b2);
-        
+		initScene(primaryStage);
+
         camera = (gameLogic = new GameLogic(canvas)).camera;
         
 		addEvents();
@@ -72,37 +58,50 @@ public class GameWindow extends Application{
         
        
 	}	
+	private void initScene(Stage primaryStage) {
+		try {
+			primaryStage.setTitle("Game");
+			root = FXMLLoader.load(new URL("file:"+new File("data/fxml/gui.fxml").getAbsolutePath()));
+	        scene = new Scene(root);
+	        scene.getStylesheets().clear();
+	        scene.getStylesheets().add("file:///" + new File("data/fxml/style.css").getAbsolutePath().replace("\\", "/"));
+	        primaryStage.setScene(scene);
+	        canvas = (Canvas)scene.lookup("#canvas");
+	        
+	        b1 = (Button)scene.lookup("#bMenu");
+	        b2 = (Button)scene.lookup("#bNext");
+	        //secondScene.getStylesheets().add(new URL("file:"+new File("data/fxml/menu.fxml").getAbsolutePath()).getPath());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			Runtime.getRuntime().exit(0);
+		}
+	}
+	@SuppressWarnings("unchecked")
 	private void startSecond() {
         //WTF?!?!?!?
 		try {
-			Parent root = FXMLLoader.load(new URL("file:"+this.getClass().getClassLoader().getResource("").getPath()+"/../data/fxml/menu.fxml"));
+			Parent root = FXMLLoader.load(new URL("file:"+new File("data/fxml/menu.fxml").getAbsolutePath()));
 	        Scene secondScene = new Scene(root, 323, 254);
+	        secondScene.getStylesheets().clear();
+	        secondScene.getStylesheets().add("file:///" + new File("data/fxml/style.css").getAbsolutePath().replace("\\", "/"));
 	        secondStage = new Stage();
 	        secondStage.setTitle("Main Menu");
 	        secondStage.setScene(secondScene);
 	        secondStage.show();
 	        
 	        ObservableList<String> choice = FXCollections.observableArrayList("Empty", "Human", "Computer");
-	        ((ChoiceBox<String>)secondScene.lookup("#cb1")).setItems(choice);
-	        ((ChoiceBox<String>)secondScene.lookup("#cb2")).setItems(choice);
-	        ((ChoiceBox<String>)secondScene.lookup("#cb3")).setItems(choice);
-	        ((ChoiceBox<String>)secondScene.lookup("#cb4")).setItems(choice);
-	        ((ChoiceBox<String>)secondScene.lookup("#cb5")).setItems(choice);
-	        ((ChoiceBox<String>)secondScene.lookup("#cb6")).setItems(choice);
-	        
+	        for (int i = 0;i<6;i++) {
+	        	((ChoiceBox<String>)secondScene.lookup("#cb"+(i+1))).setItems(choice);
+	        	((ChoiceBox<String>)secondScene.lookup("#cb"+(i+1))).getSelectionModel().select(2);
+	        }
 	        ((ChoiceBox<String>)secondScene.lookup("#cb1")).getSelectionModel().select(1);
-	        ((ChoiceBox<String>)secondScene.lookup("#cb2")).getSelectionModel().select(2);
-	        ((ChoiceBox<String>)secondScene.lookup("#cb3")).getSelectionModel().select(2);
-	        ((ChoiceBox<String>)secondScene.lookup("#cb4")).getSelectionModel().select(2);
-	        ((ChoiceBox<String>)secondScene.lookup("#cb5")).getSelectionModel().select(2);
-	        ((ChoiceBox<String>)secondScene.lookup("#cb6")).getSelectionModel().select(2);
-	        
-	        ((ColorPicker)secondScene.lookup("#cp1")).setValue(Color.web("#1a3399"));
-	        ((ColorPicker)secondScene.lookup("#cp2")).setValue(Color.web("#b31a1a"));
-	        ((ColorPicker)secondScene.lookup("#cp3")).setValue(Color.web("#1a4d1a"));
-	        ((ColorPicker)secondScene.lookup("#cp4")).setValue(Color.web("#b3b31a"));
-	        ((ColorPicker)secondScene.lookup("#cp5")).setValue(Color.web("#4d1a4d"));
-	        ((ColorPicker)secondScene.lookup("#cp6")).setValue(Color.web("#336666"));
+	        	
+	        //String[] colors = new String[] {"#1a3399","#b31a1a","#1a4d1a","#b3b31a","#4d1a4d","#336666"};
+	        String[] colors = new String[] {"#00f","#f00","#0f0","#ff0","#f0f","#0ff"};
+	        for (int i = 0;i<6;i++)
+	        	((ColorPicker)secondScene.lookup("#cp"+(i+1))).setValue(Color.web(colors[i]));
+
 	        ((Button)secondScene.lookup("#bClose")).setOnMouseClicked(e -> {
 	        	Runtime.getRuntime().exit(0);
 			});
@@ -113,18 +112,19 @@ public class GameWindow extends Application{
 			});
 	        ((Button)secondScene.lookup("#bStart")).setOnMouseClicked(e -> {
 	        	
-	    		Player[] player =  new Player[]{
-	    				new Player("player1",((ColorPicker)secondScene.lookup("#cp1")).getValue(),PlayerControl.values()[((ChoiceBox<String>)secondScene.lookup("#cb1")).getSelectionModel().getSelectedIndex()]),
-	    				new Player("player2",((ColorPicker)secondScene.lookup("#cp2")).getValue(),PlayerControl.values()[((ChoiceBox<String>)secondScene.lookup("#cb2")).getSelectionModel().getSelectedIndex()]),
-	    				new Player("player3",((ColorPicker)secondScene.lookup("#cp3")).getValue(),PlayerControl.values()[((ChoiceBox<String>)secondScene.lookup("#cb3")).getSelectionModel().getSelectedIndex()]),
-	    				new Player("player4",((ColorPicker)secondScene.lookup("#cp4")).getValue(),PlayerControl.values()[((ChoiceBox<String>)secondScene.lookup("#cb4")).getSelectionModel().getSelectedIndex()]),
-	    				new Player("player5",((ColorPicker)secondScene.lookup("#cp5")).getValue(),PlayerControl.values()[((ChoiceBox<String>)secondScene.lookup("#cb5")).getSelectionModel().getSelectedIndex()]),
-	    				new Player("player6",((ColorPicker)secondScene.lookup("#cp6")).getValue(),PlayerControl.values()[((ChoiceBox<String>)secondScene.lookup("#cb6")).getSelectionModel().getSelectedIndex()])
-	    			};
-	    		
+	    		Player[] player =  new Player[6];
+	    		for (int i = 0;i<6;i++) {
+	    			player[i] = new Player(
+    					"Player"+(i+1),
+    					((ColorPicker)secondScene.lookup("#cp"+(i+1))).getValue(),
+    					PlayerControl.values()[((ChoiceBox<String>)secondScene.lookup("#cb"+(i+1))).getSelectionModel().getSelectedIndex()]
+    					);
+	    		}
 	    		gameLogic.initGame(player);
 	        	secondStage.hide();
 	        	primaryStage.show();
+				canvas.setWidth(scene.getWidth());
+				canvas.setHeight(scene.getHeight());
 	        	gameLogic.renderer.startRendering();	
 			});
 		} catch (IOException e) {
@@ -146,10 +146,11 @@ public class GameWindow extends Application{
 		});
 		b2.setOnMouseClicked(e -> {
 			gameLogic.nextRound();
+			b2.setText("Round "+gameLogic.game.getCurrentRound()+" : Next");
 		});
 	
 		scene.setOnMouseDragged(e -> {
-			if (mMouseDown) camera.onMouseDrag(e);
+			if (pMouseDown||mMouseDown) camera.onMouseDrag(e);
 			});
 		scene.setOnMouseMoved(e -> {
 			gameLogic.move();camera.onMouseMove(e);

@@ -18,6 +18,9 @@ public class Camera {
 	
 	public int mouseX;
 	public int mouseY;
+	
+	public boolean moving = false;
+	
 	public Camera() {
 		this(0,0,1);
 	}
@@ -25,6 +28,13 @@ public class Camera {
 		this.posX = posX;this.posY = posY;this.scale = scale;
 	}
 
+	public void mouseSideScroll() {
+		if (canvas == null)return;
+		if (mouseX<5) addPos(-20/scale,0);
+		if (mouseX>canvas.getWidth()-20) addPos(20/scale,0);
+		if (mouseY<5) addPos(0,-20/scale);
+		if (mouseY>canvas.getHeight()-20) addPos(0,20/scale);
+	}
 	//basic move functions
 	public void setPos(float posX, float posY) {
 		this.posX = posX;this.posY = posY;
@@ -42,7 +52,7 @@ public class Camera {
 		else while (this.posY>world.height&&world.repeatY)this.posY -= world.height;
 	}
 	public void addPos(float posX, float posY) {
-		setPos(this.posX+posX,this.posY+posY) ;
+		setPos(this.posX+posX,this.posY+posY);
 	}
 	public void setScale(float scale) {
 		this.scale = scale;
@@ -66,10 +76,12 @@ public class Camera {
 	}
 	
 	public void onMouseDrag(MouseEvent e) {
+		moving = true;
 		addScaledPos(mouseX-(int)e.getX(), mouseY-(int)e.getY());
 		mouseX = (int) e.getX();mouseY = (int) e.getY();
 	}
 	public void onMouseMove(MouseEvent e) {
+		moving = false;
 		mouseX = (int) e.getX();mouseY = (int) e.getY();
 	}
 	public void onScroll(ScrollEvent e) {
@@ -84,7 +96,6 @@ public class Camera {
     		(float)(this.posX-(-posX +(canvas.getWidth()/2*(e.getX()/canvas.getWidth()*2-1))/this.scale)),
     		(float)(this.posY-(-posY +(canvas.getHeight()/2*(e.getY()/canvas.getHeight()*2-1))/this.scale))/this.tilt
     	);
-    	
     	
 	}
 	

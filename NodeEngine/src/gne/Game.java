@@ -1,16 +1,30 @@
 package gne;
 
+import java.util.*;
+
 public class Game {
 	World world;
 	Player[] player;
 	int activePlayer;
 	int localPlayer;
+	int currentRound;
 	
+	Timer gameTimer;
 	
 	public Game(World world,Player[] player) {
 		this.world = world;this.player = player;
 		for (int i = 0;i<player.length;i++)player[i].id = i;
 		activePlayer = 0;
+		currentRound = 1;
+		gameTimer = new Timer();
+		gameTimer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+			// Your database code here
+				//System.out.printf("sfdsfd");
+			}
+		}, 10,10);
+		
 	}
 	public World getWorld() {
 		return world;
@@ -20,9 +34,10 @@ public class Game {
 	}
 	
 	public void nextPlayer() {
-		if (activePlayer < player.length-1)activePlayer++;
+		if (activePlayer == 0) currentRound++;
+		if (activePlayer < player.length-1) activePlayer++;
 		else activePlayer = 0;
-		if (world.getNumberOfNodesOwnedByPlayer(player[activePlayer]) == 0 || player[activePlayer].controlTyp == PlayerControl.Empty)nextPlayer();
+		if (world.getNumberOfNodesOwnedByPlayer(player[activePlayer]) == 0 || player[activePlayer].controlTyp == PlayerControl.Empty) nextPlayer();
 	}
 	
 	public Player getActivePlayer() {
@@ -37,6 +52,9 @@ public class Game {
 	}
 	public void setLocalPlayer(Player player) {
 		localPlayer = player.id;
+	}
+	public int getCurrentRound() {
+		return currentRound;
 	}
 	
 }

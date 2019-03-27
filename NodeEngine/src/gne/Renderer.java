@@ -1,6 +1,6 @@
 package gne;
 
-import gne.assets.*;
+//import gne.assets.*;
 
 import java.io.File;
 import java.util.*;
@@ -32,6 +32,7 @@ public class Renderer {
 	protected Camera camera;
 	
 	//render used
+	Timer effectTimer;
 	AnimationTimer animationTimer;
 	//Image[] images;
 	//Texture[] textureList;
@@ -47,6 +48,13 @@ public class Renderer {
 		camera = new Camera(0,0,1);
 		this.canvas = canvas;
 		this.gc = canvas.getGraphicsContext2D();	
+		effectTimer = new Timer();
+		effectTimer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				camera.mouseSideScroll();
+			}
+		}, 10,10);
 		animationTimer = new AnimationTimer() {
             @Override
             public void handle(long now) {
@@ -65,7 +73,40 @@ public class Renderer {
 	
 	//public render calls
 	public void render() {
+    	
+		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
     	int ms = (int)System.currentTimeMillis();
+    	
+    	int timeX = (((int)((long)((double)System.currentTimeMillis()*0.01d)))-(int)(camera.posX))%256;
+    	int timeY = (((int)((long)((double)System.currentTimeMillis()*0.011d)))-(int)(camera.posY))%256;
+    	
+    	for (int ix = -2;ix<=canvas.getWidth()/(128*camera.scale);ix++) {
+    		for (int iy = -2;iy<=canvas.getHeight()/(128*camera.scale);iy++) {
+       			gc.drawImage(
+    	        		world.waterImage
+    	        		, 0, 0, world.waterImage.getWidth(), world.waterImage.getHeight()
+    	        		, (128*ix-camera.posX%256)*camera.scale, (128*iy+timeY)*camera.scale, 
+    	        		256*camera.scale+1, 256*camera.scale*camera.tilt+1
+            		);
+       			
+    			gc.drawImage(
+    	        		world.waterImage
+    	        		, 0, 0, world.waterImage.getWidth(), world.waterImage.getHeight()
+    	        		, (128*ix+((-(int)((long)((double)System.currentTimeMillis()*0.01d)))-(int)(camera.posX))%256)*camera.scale, (128*iy+((-(int)((long)((double)System.currentTimeMillis()*0.011d)))-(int)(camera.posY))%256)*camera.scale, 
+    	        		256*camera.scale+1, 256*camera.scale*camera.tilt+1
+            		);
+            		
+    			gc.drawImage(
+	        		world.waterImage
+	        		, 0, 0, world.waterImage.getWidth(), world.waterImage.getHeight()
+	        		, (128*ix+timeX)*camera.scale, (128*iy-camera.posY%256)*camera.scale, 
+	        		512*camera.scale+1, 512*camera.scale*camera.tilt+1
+        		);
+        		
+
+    		}
+    	}
+    	
     	
     	fpsCounter++;
     	if (fpsDelta < System.currentTimeMillis()-1000) {
@@ -76,7 +117,7 @@ public class Renderer {
     	
     	int width = (int)canvas.getWidth(), height = (int)canvas.getHeight();
     	if (world != null) {
-	    	world.finalProcessing();
+	    	world.deepSorting();
 	    	if (world.repeatX) drawWorld(-world.width,0);
 	    	drawWorld(0,0);
 	    	if (world.repeatX) drawWorld(world.width,0);
@@ -98,7 +139,6 @@ public class Renderer {
     	
     	drawGUI((int)canvas.getWidth(),(int)canvas.getHeight());
     	drawMouse(camera.mouseX,camera.mouseY);
-    	
 	
     	ms -= (int)System.currentTimeMillis();
     	gc.setFill(Color.LIME);
@@ -115,7 +155,6 @@ public class Renderer {
 	
 	private void drawImage(Image img,int sx,int sy, int sw, int sh, int dx, int dy, int dw, int dh) {
 
-	//Canvas canfuck = new Canvas(width,height);
 		PixelReader reader = img.getPixelReader();
 		PixelWriter writer = gc.getPixelWriter();
 		for (int ix = 0;ix<sw;ix++) {
@@ -132,6 +171,7 @@ public class Renderer {
 	private void drawWorld(int posX,int posY) {
     	float oldX = camera.posX,oldY = camera.posY;
     	camera.posX += posX;camera.posY += posY;
+    	
     	if (world.backgroundImage != null)
     	gc.drawImage(
     		world.backgroundImage

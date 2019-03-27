@@ -1,0 +1,46 @@
+
+._background {
+    -fx-background-color:  #112;
+}
+.canvas{
+    -fx-background-color:  #000;
+}
+._text,.choice-box ,.text-field,.color-picker {
+    -fx-background-color:  #334;
+    -fx-border-color: rgb(92, 67, 201);
+    -fx-border-radius: 0;
+}
+.choice-box .context-menu { 
+    -fx-background-color: #223; 
+    -fx-border-color: rgb(92, 67, 201);
+    -fx-border-radius: 0;
+}
+.choice-box .menu-item:focused { -fx-background-color: #444; }
+
+._Button, .button {
+    -fx-background-color:  #334;
+    -fx-border-color: rgb(92, 67, 201);
+    -fx-border-radius: 5;
+}
+.button:hover,.choice-box:hover,.color-picker:hover { 
+    -fx-background-color:  #223;
+}
+.button:pressed,.choice-box:pressed,.color-picker:pressed  {
+    -fx-background-color:  #444;
+}
+
+._font ,
+._background,
+.label,
+._Button, .button,
+.choice-box .menu-item > .label,
+.choice-box .menu-item:focused > .label,
+.choice-box > .label ,.color-picker > .label,
+._text,.choice-box ,.text-field,.color-picker 
+{
+    -fx-text-fill: white;
+    -fx-font-family: "Impact";
+}
+._gui{
+    /* fx-font-size: "Impact 18px";  */
+}
