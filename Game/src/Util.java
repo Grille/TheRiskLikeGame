@@ -13,7 +13,6 @@ public class Util {
 		
     	town = new Texture("file:/../data/png/town.png");	
 
-    	
 		Random rnd = new Random();
 		World world = new World(3200,2000);
 	
@@ -117,19 +116,26 @@ public class Util {
 		au[1].conectWithNodes(new Node[] {au[2],au[3]});
 		au[2].conectWithNodes(new Node[] {au[3]});
 
-		world.addNodes(na,"na");
-		world.addNodes(sa,"sa");
-		world.addNodes(eu,"eu");
-		world.addNodes(af,"af");
-		world.addNodes(as,"as");
-		world.addNodes(au,"au");
+		world.addNodes(na);
+		world.addNodes(sa);
+		world.addNodes(eu);
+		world.addNodes(af);
+		world.addNodes(as);
+		world.addNodes(au);
 
+		world.groupNodes("North America", "#b4c62e",5, na);
+		world.groupNodes("South America", "#b24a32",2, sa);
+		world.groupNodes("Africa", "#554fa8",3, af);
+		world.groupNodes("Europe", "#a47e3b",5, eu);
+		world.groupNodes("Asia", "#418347",7, as);
+		world.groupNodes("Australia", "#974070",2, au);
+		
 		world.setBackgroundGraphic(new Texture("file:/../data/png/ground.png"));
 		world.setWaterGraphic(new Texture("file:/../data/png/water.png"));
 		world.repeatX = true;
-
-
-		
+		world.save("world.nwf");
+    	 	
+		world.load("world.nwf");
 		return world;
 	}
 }

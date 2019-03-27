@@ -39,7 +39,7 @@ public class Camera {
 	public void setPos(float posX, float posY) {
 		this.posX = posX;this.posY = posY;
 		
-		if (world == null)return;
+		if (world == null) return;
 
 		if(this.posX<0&&!world.repeatX)this.posX=0;
 		else while (this.posX<0&&world.repeatX)this.posX += world.width;

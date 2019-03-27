@@ -76,7 +76,7 @@ public class Renderer {
     	
 		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
     	int ms = (int)System.currentTimeMillis();
-    	
+    	/*
     	int timeX = (((int)((long)((double)System.currentTimeMillis()*0.01d)))-(int)(camera.posX))%256;
     	int timeY = (((int)((long)((double)System.currentTimeMillis()*0.011d)))-(int)(camera.posY))%256;
     	
@@ -106,6 +106,7 @@ public class Renderer {
 
     		}
     	}
+    	*/
     	
     	
     	fpsCounter++;
@@ -114,7 +115,7 @@ public class Renderer {
     		fps = fpsCounter;
     		fpsCounter = 0;
     	}
-    	
+
     	int width = (int)canvas.getWidth(), height = (int)canvas.getHeight();
     	if (world != null) {
 	    	world.deepSorting();
@@ -140,12 +141,11 @@ public class Renderer {
     	drawGUI((int)canvas.getWidth(),(int)canvas.getHeight());
     	drawMouse(camera.mouseX,camera.mouseY);
 	
-    	ms -= (int)System.currentTimeMillis();
     	gc.setFill(Color.LIME);
 		gc.setFill(Color.BLACK);
     	gc.setFont(new Font("consolas", 15));
     	gc.setTextAlign(TextAlignment.LEFT);
-    	gc.fillText("Debug: "+ms + "\nFPS: "+fps+"\nPosX: "+camera.getCurrentPosX(), 0, 15+40);
+    	gc.fillText("\n\n\nDebug: "+((int)System.currentTimeMillis()-ms) + "\nFPS: "+fps+"\nPosX: "+camera.getCurrentPosX(), 0, 15+40);
     	
     	
 

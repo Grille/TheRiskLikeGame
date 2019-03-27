@@ -23,6 +23,7 @@ import javafx.scene.canvas.*;
 import javafx.scene.control.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcType;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 public class GameWindow extends Application{
@@ -33,7 +34,10 @@ public class GameWindow extends Application{
 	Stage primaryStage;
 	Stage secondStage;
 	Camera camera;
-	
+	Label tbName;
+	Rectangle dLpc,dMpc,dRpc;
+
+
 	GameLogic gameLogic;
 	
 	public static void main(String[] args)  {
@@ -45,8 +49,8 @@ public class GameWindow extends Application{
 		secondStage = null;
 		this.primaryStage = primaryStage;
 		initScene(primaryStage);
-
-        camera = (gameLogic = new GameLogic(canvas)).camera;
+		gameLogic = new GameLogic(this);
+        camera = gameLogic.camera;
         
 		addEvents();
 	
@@ -70,6 +74,10 @@ public class GameWindow extends Application{
 	        
 	        b1 = (Button)scene.lookup("#bMenu");
 	        b2 = (Button)scene.lookup("#bNext");
+	        dLpc = (Rectangle)scene.lookup("#dLpc");
+	        dMpc = (Rectangle)scene.lookup("#dMpc");
+	        dRpc = (Rectangle)scene.lookup("#dRpc");
+	        tbName = (Label)scene.lookup("#tbName");
 	        //secondScene.getStylesheets().add(new URL("file:"+new File("data/fxml/menu.fxml").getAbsolutePath()).getPath());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -147,6 +155,7 @@ public class GameWindow extends Application{
 		b2.setOnMouseClicked(e -> {
 			gameLogic.nextRound();
 			b2.setText("Round "+gameLogic.game.getCurrentRound()+" : Next");
+
 		});
 	
 		scene.setOnMouseDragged(e -> {

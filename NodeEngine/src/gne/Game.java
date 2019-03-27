@@ -10,6 +10,7 @@ public class Game {
 	int currentRound;
 	
 	Timer gameTimer;
+	boolean running;
 	
 	public Game(World world,Player[] player) {
 		this.world = world;this.player = player;
@@ -20,12 +21,28 @@ public class Game {
 		gameTimer.schedule(new TimerTask() {
 			@Override
 			public void run() {
-			// Your database code here
-				//System.out.printf("sfdsfd");
+				if (running) {
+					tick();
+				}
 			}
 		}, 10,10);
 		
 	}
+
+	public void tick() {
+
+	}
+	public void fight() {
+		
+	}
+	
+	public void start() {
+		running=true;
+	}
+	public void stop() {
+		running=false;
+	}
+	
 	public World getWorld() {
 		return world;
 	}
