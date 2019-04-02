@@ -60,7 +60,7 @@ public class GameLogic {
 	}
 	public void initGame(Player[] player) {
 		//world = Util.initWorld();
-		world = new World("world.nwf");
+		world = new World("data/maps/world.nwf");
 		players = player;
 		game = new Game(world,players);
 		renderer.setRenderSource(game,camera);

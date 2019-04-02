@@ -11,6 +11,7 @@ public class BinaryFileReader {
 			File file = new File(path);
 			data = Files.readAllBytes(file.toPath());
 		} catch (IOException e) {
+			System.err.println("file: "+ path +" not found!");
 			e.printStackTrace();
 		}
 		index=0;
