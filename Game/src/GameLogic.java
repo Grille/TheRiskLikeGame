@@ -130,6 +130,33 @@ public class GameLogic {
 	
 	float attackCalc(float attackUnits,float defendUnits) {
 		return (attackUnits/(attackUnits+defendUnits))*0.5f+0.25f;
+		/*
+		int attack = (int)(attackUnits>3?3:attackUnits);
+		int defend = (int)(attackUnits>2?2:attackUnits);
+		switch (attack) {
+			case 0: return 0;
+			case 1:
+				switch (defend) {
+				case 0: return 1;
+				case 1: return 0.42f;
+				case 2: return 0.26f;
+				}
+			case 2:
+				switch (defend) {
+				case 0: return 1;
+				case 1: return 0.58f;
+				case 2: return 0.23f;
+			}
+			case 3:
+				switch (defend) {
+				case 0: return 1;
+				case 1: return 0.66f;
+				case 2: return 0.37f;
+			}
+		}
+		return 0;
+		*/
+		 
 	}
 	public void move() {
 		Node node = camera.getNearestNode(70);
@@ -184,7 +211,7 @@ public class GameLogic {
 				maxPoints = newPoints;
 			}
 		}
-		System.out.println(player.getName() +" / "+bigestEnemy.getName() + "("+maxPoints+")");
+		//System.out.println(player.getName() +" / "+bigestEnemy.getName() + "("+maxPoints+")");
 		
 		// phase 1 distribute new units
 		list = randomIntList(world.getNodes().length);

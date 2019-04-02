@@ -245,6 +245,7 @@ public class World {
 		BinaryFileReader reader = new BinaryFileReader(path);
 		name = reader.readString();
 		setBackgroundGraphic(new Texture(reader.readString()));
+		this.waterImage = new Texture("file:/../data/png/water.png");
 		width = reader.readInt16();
 		height = reader.readInt16();
 		repeatX = reader.readBool();

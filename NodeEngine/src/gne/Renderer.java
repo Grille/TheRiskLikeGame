@@ -76,37 +76,39 @@ public class Renderer {
     	
 		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
     	int ms = (int)System.currentTimeMillis();
-    	/*
-    	int timeX = (((int)((long)((double)System.currentTimeMillis()*0.01d)))-(int)(camera.posX))%256;
-    	int timeY = (((int)((long)((double)System.currentTimeMillis()*0.011d)))-(int)(camera.posY))%256;
     	
-    	for (int ix = -2;ix<=canvas.getWidth()/(128*camera.scale);ix++) {
-    		for (int iy = -2;iy<=canvas.getHeight()/(128*camera.scale);iy++) {
-       			gc.drawImage(
-    	        		world.waterImage
-    	        		, 0, 0, world.waterImage.getWidth(), world.waterImage.getHeight()
-    	        		, (128*ix-camera.posX%256)*camera.scale, (128*iy+timeY)*camera.scale, 
-    	        		256*camera.scale+1, 256*camera.scale*camera.tilt+1
-            		);
-       			
-    			gc.drawImage(
-    	        		world.waterImage
-    	        		, 0, 0, world.waterImage.getWidth(), world.waterImage.getHeight()
-    	        		, (128*ix+((-(int)((long)((double)System.currentTimeMillis()*0.01d)))-(int)(camera.posX))%256)*camera.scale, (128*iy+((-(int)((long)((double)System.currentTimeMillis()*0.011d)))-(int)(camera.posY))%256)*camera.scale, 
-    	        		256*camera.scale+1, 256*camera.scale*camera.tilt+1
-            		);
-            		
-    			gc.drawImage(
-	        		world.waterImage
-	        		, 0, 0, world.waterImage.getWidth(), world.waterImage.getHeight()
-	        		, (128*ix+timeX)*camera.scale, (128*iy-camera.posY%256)*camera.scale, 
-	        		512*camera.scale+1, 512*camera.scale*camera.tilt+1
-        		);
-        		
-
-    		}
+    	if (world.waterImage!=null) {
+	    	int timeX = (((int)((long)((double)System.currentTimeMillis()*0.01d)))-(int)(camera.posX))%256;
+	    	int timeY = (((int)((long)((double)System.currentTimeMillis()*0.011d)))-(int)(camera.posY))%256;
+	    	
+	    	for (int ix = -2;ix<=canvas.getWidth()/(128*camera.scale);ix++) {
+	    		for (int iy = -2;iy<=canvas.getHeight()/(128*camera.scale);iy++) {
+	       			gc.drawImage(
+	    	        		world.waterImage
+	    	        		, 0, 0, world.waterImage.getWidth(), world.waterImage.getHeight()
+	    	        		, (128*ix-camera.posX%256)*camera.scale, (128*iy+timeY)*camera.scale, 
+	    	        		256*camera.scale+1, 256*camera.scale*camera.tilt+1
+	            		);
+	       			
+	    			gc.drawImage(
+	    	        		world.waterImage
+	    	        		, 0, 0, world.waterImage.getWidth(), world.waterImage.getHeight()
+	    	        		, (128*ix+((-(int)((long)((double)System.currentTimeMillis()*0.01d)))-(int)(camera.posX))%256)*camera.scale, (128*iy+((-(int)((long)((double)System.currentTimeMillis()*0.011d)))-(int)(camera.posY))%256)*camera.scale, 
+	    	        		256*camera.scale+1, 256*camera.scale*camera.tilt+1
+	            		);
+	            		
+	    			gc.drawImage(
+		        		world.waterImage
+		        		, 0, 0, world.waterImage.getWidth(), world.waterImage.getHeight()
+		        		, (128*ix+timeX)*camera.scale, (128*iy-camera.posY%256)*camera.scale, 
+		        		512*camera.scale+1, 512*camera.scale*camera.tilt+1
+	        		);
+	        		
+	
+	    		}
+	    	}
     	}
-    	*/
+    	
     	
     	
     	fpsCounter++;
@@ -153,13 +155,18 @@ public class Renderer {
 	public void startRendering() {animationTimer.start();}
 	public void stopRendering() {animationTimer.stop();}
 	
+	private void drawImage(Image img,double sx,double sy, double sw, double sh, double dx, double dy, double dw, double dh) {
+		drawImage(img,(int)sx,(int)sy,(int)sw,(int)sh,(int)dx,(int)dy,(int)dw,(int)dh);
+	}
 	private void drawImage(Image img,int sx,int sy, int sw, int sh, int dx, int dy, int dw, int dh) {
 
 		PixelReader reader = img.getPixelReader();
 		PixelWriter writer = gc.getPixelWriter();
-		for (int ix = 0;ix<sw;ix++) {
-			for (int iy = 0;iy<sh;iy++) {
-				Color color = reader.getColor(sx+ix, sy+iy);
+		for (int ix = 0;ix<dw;ix++) {
+			for (int iy = 0;iy<dh;iy++) {
+				int spx = sx+(int)(ix*sw/dw);
+				int spy = sy+(int)(iy*sh/dh);
+				Color color = reader.getColor(spx, spy);
 				if (color.isOpaque()) {
 					writer.setColor(dx+ix, dy+iy, color);
 				}
